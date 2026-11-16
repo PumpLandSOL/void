@@ -1,7 +1,7 @@
 // shared look for the VOID kit: page head, mark, footer and the seekable stipple field with its empty disc
 'use strict';
 // set these when the handle and the domain exist; every graphic footer, video end card and the X kit pick them up
-const X = '', SITE = 'voidqaas.xyz', TICK = '$VOID';
+const X = '@VoidQaas', SITE = 'voidqaas.xyz', TICK = '$VOID';
 const LINE = [SITE, X, 'quantum-as-a-service'].filter(Boolean).join(' · ');
 const FONTS = `<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Geist+Mono:wght@400&display=swap" rel="stylesheet">`;
 const MARK = (s = 40) => { let o = ''; for (let i = 0; i < 12; i++) { const a = (i / 12) * Math.PI * 2 - Math.PI / 2, r = i % 3 === 0 ? 1.5 : 1.1; o += `<rect x="${(12 + Math.cos(a) * 8.6 - r).toFixed(2)}" y="${(12 + Math.sin(a) * 8.6 - r).toFixed(2)}" width="${r * 2}" height="${r * 2}" fill="${i === 2 ? '#ffffff' : '#a855f7'}"/>`; } return `<svg width="${s}" height="${s}" viewBox="0 0 24 24">${o}</svg>`; };
