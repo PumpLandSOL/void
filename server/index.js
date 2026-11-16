@@ -3,7 +3,8 @@
 //   2. mixes them with the NIST Randomness Beacon, drand and the operating system's generator,
 //   3. publishes a signed, hash-chained public beacon round every ROUND_SEC seconds, with every input revealed,
 //   4. serves entropy, raw quantum bytes and provably fair draws over a small HTTP API,
-//   5. serves the site (landing, console, key forge, docs).
+//   5. simulates quantum circuits exactly and samples their measurements with quantum entropy,
+//   6. serves the site (landing, console, simulator, key forge, docs).
 // The rules a third party needs to re-check any of it live in client/voidlib.js, which this file imports too.
 import http from 'node:http';
 import fs from 'node:fs';
@@ -11,6 +12,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { roundOutput, roundMessage, commitOf, draw, shuffle, receiptMessage, health, ZERO, hex } from '../client/voidlib.js';
+import * as Q from '../client/qsim.js';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 // private settings can live in a git-ignored .env next to package.json; real environment variables win
@@ -32,8 +34,9 @@ const BOOT = Date.now();
 const sha3 = (alg, ...parts) => { const h = crypto.createHash(alg); for (const p of parts) h.update(p); return h.digest(); };
 
 // ---------- state ----------
-let db = { n: 0, last: ZERO, nextLocal: '', rounds: [], key: null, c: { quantumIn: 0, quantumBeacon: 0, quantumServed: 0, entropyReq: 0, entropyBytes: 0, rawReq: 0, draws: 0 } };
+let db = { n: 0, last: ZERO, nextLocal: '', rounds: [], key: null, c: { quantumIn: 0, quantumBeacon: 0, quantumServed: 0, entropyReq: 0, entropyBytes: 0, rawReq: 0, draws: 0, sims: 0, shots: 0 } };
 try { db = Object.assign(db, JSON.parse(fs.readFileSync(DATA_PATH, 'utf8'))); } catch (e) { try { db = Object.assign(db, JSON.parse(fs.readFileSync(DATA_PATH + '.bak', 'utf8'))); } catch (e2) {} }
+db.c = Object.assign({ quantumIn: 0, quantumBeacon: 0, quantumServed: 0, entropyReq: 0, entropyBytes: 0, rawReq: 0, draws: 0, sims: 0, shots: 0 }, db.c);   // counters added in later versions start at zero
 // the node's signing key (ed25519). Made once, kept in the data file, never served.
 if (!db.key) { const k = crypto.generateKeyPairSync('ed25519'); db.key = { priv: k.privateKey.export({ format: 'der', type: 'pkcs8' }).toString('base64'), pub: k.publicKey.export({ format: 'der', type: 'spki' }).subarray(12).toString('hex') }; }
 const PRIV = crypto.createPrivateKey({ key: Buffer.from(db.key.priv, 'base64'), format: 'der', type: 'pkcs8' }), NODE_KEY = db.key.pub;
@@ -88,13 +91,14 @@ const roundAt = (i) => { const first = db.rounds.length ? db.rounds[0].index : 0
 
 // ---------- http ----------
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml', '.json': 'application/json', '.map': 'application/json' };
-const PAGES = { '/': 'index.html', '/console': 'console.html', '/forge': 'forge.html', '/docs': 'docs.html' };
+const PAGES = { '/': 'index.html', '/console': 'console.html', '/sim': 'sim.html', '/forge': 'forge.html', '/docs': 'docs.html' };
 const fill = (s) => s.replace(/\{\{SITE_URL\}\}/g, SITE_URL).replace(/\{\{X_URL\}\}/g, X_URL);
 const json = (res, code, o) => { res.writeHead(code, { 'content-type': 'application/json', 'access-control-allow-origin': '*', 'cache-control': 'no-store' }); res.end(JSON.stringify(o)); };
 // simple per-address rate limit: N requests a minute per bucket
 const hits = new Map(); setInterval(() => hits.clear(), 60000).unref();
 const limited = (req, bucket, max) => { const ip = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim(), k = bucket + '|' + ip, n = (hits.get(k) || 0) + 1; hits.set(k, n); return n > max; };
 const intq = (q, k, d) => { const v = q.get(k); return v === null || v === '' ? d : Number(v); };
+const readBody = (req) => new Promise((r) => { let b = ''; req.on('data', (c) => { b += c; if (b.length > 40000) { b = ''; req.destroy(); } }); req.on('end', () => { try { r(JSON.parse(b || '{}') || {}); } catch (e) { r(null); } }); req.on('error', () => r(null)); });
 
 function stats() {
   const l = latest(), sample = recentLen === recent.length ? Buffer.concat([recent.subarray(recentPos), recent.subarray(0, recentPos)]) : recent.subarray(0, recentLen);
@@ -107,8 +111,9 @@ function stats() {
 const server = http.createServer(async (req, res) => {
   const u = new URL(req.url, 'http://x'), p = u.pathname, q = u.searchParams;
   try {
+    if (req.method === 'OPTIONS') { res.writeHead(204, { 'access-control-allow-origin': '*', 'access-control-allow-methods': 'GET, POST, OPTIONS', 'access-control-allow-headers': 'content-type', 'access-control-max-age': '86400' }); return res.end(); }
     if (p === '/api/health') return json(res, 200, { ok: true, round: db.n - 1, reservoir: reservoirLen });
-    if (p === '/api/config') return json(res, 200, { siteUrl: SITE_URL, xUrl: X_URL, ghUrl: GH_URL, nodeKey: NODE_KEY, roundSec: ROUND_SEC, token: { ticker: 'VOID', chain: TOKEN_CHAIN, mint: VOID_MINT }, limits: { entropyBytes: MAX_BYTES, rawBytes: MAX_RAW } });
+    if (p === '/api/config') return json(res, 200, { siteUrl: SITE_URL, xUrl: X_URL, ghUrl: GH_URL, nodeKey: NODE_KEY, roundSec: ROUND_SEC, token: { ticker: 'VOID', chain: TOKEN_CHAIN, mint: VOID_MINT }, limits: { entropyBytes: MAX_BYTES, rawBytes: MAX_RAW, simQubits: Q.MAX_QUBITS, simGates: Q.MAX_OPS, simShots: Q.MAX_SHOTS } });
     if (p === '/api/stats') return json(res, 200, stats());
     // ---- beacon ----
     if (p === '/api/beacon/latest') { const r = latest(); return r ? json(res, 200, r) : json(res, 503, { error: 'the first round is being produced' }); }
@@ -148,6 +153,26 @@ const server = http.createServer(async (req, res) => {
       try { if (p === '/api/draw') { const min = intq(q, 'min', 1), max = intq(q, 'max', 6), count = intq(q, 'count', 1); return json(res, 200, { round: i, output: r.output, seed, min, max, count, values: draw(r.output, seed, min, max, count), rule: 'HMAC-SHA512(round output, "VOID-DRAW-v1|seed|i"), 48-bit chunks, rejection sampling' }); }
         const n = intq(q, 'n', 52); return json(res, 200, { round: i, output: r.output, seed, n, order: shuffle(r.output, seed, n), rule: 'Fisher-Yates over the same stream as /api/draw' });
       } catch (e) { return json(res, 400, { error: p === '/api/draw' ? 'need min ≤ max, a range of at most 2^32 and count from 1 to 1000' : 'n must be between 1 and 10000' }); }
+    }
+    // ---- simulator: exact statevector simulation; the measurement is sampled with quantum entropy ----
+    // POST { qubits, code | ops, shots }. The response carries the sampling key, so the caller can re-derive the counts,
+    // and a signed receipt that binds the circuit, the counts and the number of quantum bytes used.
+    if (p === '/api/sim') {
+      if (req.method !== 'POST') return json(res, 405, { error: 'POST a JSON body: { "qubits": 2, "code": "h 0\\ncx 0 1", "shots": 1024 }' });
+      if (limited(req, 's', 60)) return json(res, 429, { error: 'rate limit: 60 simulations a minute' });
+      const d = await readBody(req); if (!d) return json(res, 400, { error: 'the body must be JSON' });
+      let ops; const qubits = Number(d.qubits), shots = d.shots === undefined ? 1024 : Number(d.shots);
+      try { ops = typeof d.code === 'string' ? Q.parse(d.code, qubits) : Q.check(d.ops || [], qubits); if (!Number.isInteger(shots) || shots < 0 || shots > Q.MAX_SHOTS) throw new Error('shots must be between 0 and ' + Q.MAX_SHOTS); } catch (e) { return json(res, 400, { error: String(e.message || e) }); }
+      const sv = Q.run(ops, qubits), probs = Q.probabilities(sv), out = { qubits, gates: ops.length, probabilities: Q.probMap(sv) };
+      if (qubits <= 5) out.amplitudes = Array.from(sv.re, (x, i) => [Q.label(i, qubits), +x.toFixed(10), +sv.im[i].toFixed(10)]);
+      db.c.sims++;
+      if (shots > 0) { const qb = take(32), id = crypto.randomBytes(16).toString('hex'), l = latest();
+        const key = Buffer.from(crypto.hkdfSync('sha512', Buffer.concat([qb.bytes, pool, crypto.randomBytes(32)]), Buffer.from(db.last, 'hex'), 'VOID-SIM-KEY-v1|' + id, 32)).toString('hex');
+        absorb('sim', Buffer.concat([Buffer.from(id, 'hex'), crypto.randomBytes(16)]));
+        const counts = Q.countMap(Q.sample(probs, shots, key), qubits); db.c.shots += shots; db.c.quantumServed += qb.bytes.length;
+        const receipt = { id, time: Date.now(), round: l ? l.index : -1, qubits, shots, quantumBytes: qb.bytes.length, circuit: Q.circuitDigest(ops, qubits), counts: Q.countsDigest(counts) };
+        Object.assign(out, { shots, counts, sampleKey: key, quantumSource: qb.source, receipt, sig: sign(Q.simMessage(receipt)), nodeKey: NODE_KEY }); }
+      return json(res, 200, out);
     }
     if (p.startsWith('/api/')) return json(res, 404, { error: 'unknown endpoint' });
     // ---- site ----

@@ -1,0 +1,96 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VOID Sim · build a quantum circuit, measure it with quantum entropy</title>
+<meta name="description" content="A quantum circuit builder and exact simulator. Place gates, see the probabilities, then measure the circuit with real quantum randomness from the VOID node.">
+<link rel="icon" href="/favicon.svg"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Geist+Mono:wght@400&display=swap" rel="stylesheet"><link rel="stylesheet" href="/style.css">
+<style>
+.lead2{color:var(--fog);font-size:16px;line-height:1.7;max-width:760px;margin-bottom:26px}.lead2 b{color:var(--ice);font-weight:400}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.chip{font:400 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--fog);border:1px solid var(--line2);border-radius:999px;padding:7px 13px;cursor:pointer;background:transparent}.chip:hover{color:var(--ice);border-color:var(--hi)}.chip.on{color:var(--void);background:var(--hi);border-color:var(--hi)}
+.pal{display:flex;gap:6px;flex-wrap:wrap;padding:14px 18px;border-bottom:1px solid var(--line)}.pal button{min-width:44px;height:38px;padding:0 10px;border:1px solid var(--line2);background:var(--void);color:var(--ice);font:400 13px var(--mono);border-radius:6px;cursor:pointer}.pal button:hover{border-color:var(--hi)}.pal button.on{background:var(--hi);color:var(--void);border-color:var(--hi)}.pal .sep{width:1px;background:var(--line);margin:0 6px}
+.grid{overflow-x:auto;padding:18px}.wire{display:flex;align-items:center;height:54px;position:relative;min-width:max-content}.wire:before{content:'';position:absolute;left:58px;right:0;top:50%;height:1px;background:var(--line2)}
+.wire .ql{width:58px;font:400 12px var(--mono);color:var(--fog);flex:none}.cell{width:54px;height:54px;flex:none;display:grid;place-items:center;position:relative;cursor:pointer}.cell:hover .slot{border-color:var(--hi)}
+.slot{width:38px;height:38px;border:1px dashed transparent;border-radius:6px;display:grid;place-items:center;font:400 13px var(--mono);position:relative;z-index:1}
+.g{background:var(--graphite);border:1px solid var(--hi);border-style:solid;color:var(--ice)}.g.ang{font-size:10px;line-height:1.1;text-align:center}.ctl{width:12px;height:12px;border-radius:50%;background:var(--hi)}.tgt{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--hi);color:var(--hi);font-size:20px;line-height:1;display:grid;place-items:center;background:var(--void)}.sw{color:var(--hi);font-size:20px}
+.link{position:absolute;left:50%;width:1.5px;background:var(--hi);z-index:0;transform:translateX(-50%)}
+textarea#code{min-height:240px;resize:vertical;line-height:1.7}
+.pb{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:7px 0;font:400 13px var(--mono)}.pb .tr{height:14px;background:var(--graphite);border-radius:2px;overflow:hidden}.pb .tr i{display:block;height:100%;background:linear-gradient(90deg,#6d28d9,#c084fc)}.pb .tr i.c{background:linear-gradient(90deg,#efeaf7,#c4b5fd)}
+.chk{display:flex;gap:10px;align-items:baseline;font:400 12px var(--mono);padding:5px 0}.chk b{font-weight:400}
+.amp{font:400 12px var(--mono);color:var(--fog);padding:4px 0;display:flex;justify-content:space-between;gap:16px}.amp span:last-child{color:var(--ice)}
+@media(max-width:900px){.cell{width:46px}}
+</style></head><body>
+<main class="app"><div class="wrap">
+  <div class="pagehead"><h1>Simulator</h1><span class="pill"><i></i>exact · up to 12 qubits</span></div>
+  <p class="lead2">Build a quantum circuit and watch what it does. The simulation is exact and runs in this page. When you measure, <b>each outcome is picked with real quantum randomness from the VOID node</b>, so the collapse you see was decided by photons and not by a formula.</p>
+
+  <div class="bar" style="margin-bottom:14px"><span class="cap" style="margin-right:6px">start from</span><span id="presets"></span></div>
+  <div class="note" id="pnote" style="margin:0 0 20px"></div>
+
+  <div class="panel">
+    <div class="hd"><span class="row" style="gap:8px"><button class="chip on" id="tBuild">build</button><button class="chip" id="tCode">code</button></span>
+      <span class="row" style="gap:8px"><span>qubits</span><button class="chip" id="qMinus">−</button><b id="qN" style="color:var(--ice);font-weight:400;min-width:14px;text-align:center">2</b><button class="chip" id="qPlus">+</button><button class="chip" id="undo">undo</button><button class="chip" id="clear">clear</button></span></div>
+    <div id="vBuild"><div class="pal" id="pal"></div><div class="grid" id="grid"></div><div class="cap" id="hint" style="padding:0 18px 16px">pick a gate, then click a wire to place it at the end of that wire</div></div>
+    <div id="vCode" style="display:none;padding:18px"><textarea id="code" spellcheck="false"></textarea><div class="cap" style="margin-top:10px">one gate per line · h x y z s t sdg tdg · rx(θ) ry(θ) rz(θ) p(θ) · cx cy cz ch cp(θ) crz(θ) · ccx · swap · angles like pi/2</div></div>
+  </div>
+  <div class="row" style="margin:18px 0 26px"><button class="btn solid" id="measure">measure with quantum entropy</button><select id="shots"><option>256</option><option selected>1024</option><option>4096</option><option>8192</option></select><span class="cap">shots</span><span class="cap" id="st"></span></div>
+
+  <div class="grid2" style="align-items:start">
+    <div class="panel"><div class="hd"><span>exact probabilities · computed in this page</span><span id="pInfo"></span></div><div style="padding:10px 18px 14px" id="probs"></div></div>
+    <div class="panel"><div class="hd"><span>measured counts · sampled by the node</span><span id="cInfo">not measured yet</span></div><div style="padding:10px 18px 14px" id="counts"><div class="dim" style="font-size:13px;padding:8px 0">Press measure. The node runs the same circuit, draws every shot from quantum entropy and signs the result.</div></div></div>
+  </div>
+  <div class="panel" style="margin-top:20px;display:none" id="ampP"><div class="hd"><span>amplitudes</span><span>the full quantum state</span></div><div style="padding:10px 18px 14px" id="amps"></div></div>
+  <div class="note">This is an exact statevector simulator: it stores every amplitude, so 12 qubits is 4,096 complex numbers. The gates are deterministic. The only random step in quantum mechanics is measurement, and that is the step VOID feeds with quantum entropy.</div>
+</div></main>
+
+<script type="importmap">{"imports":{"@noble/hashes/":"/vendor/@noble/hashes/esm/","@noble/curves/":"/vendor/@noble/curves/esm/"}}</script>
+<script type="module">
+import { chrome, APP, $, toast, num } from '/common.js';
+import { verifySig } from '/voidlib.js';
+import * as Q from '/qsim.js';
+chrome(APP, ['/console', 'console ↗']);
+let qubits = 2, ops = [], mode = 'build', sel = 'h', pending = null, lastProb = null;
+const PAL = [['h', 'H'], ['x', 'X'], ['y', 'Y'], ['z', 'Z'], ['s', 'S'], ['t', 'T'], ['rx', 'RX'], ['ry', 'RY'], ['rz', 'RZ'], null, ['cx', 'CX'], ['cz', 'CZ'], ['swap', 'SWAP'], ['ccx', 'CCX']];
+const NEED = { cx: ['control', 'target'], cz: ['first qubit', 'second qubit'], swap: ['first qubit', 'second qubit'], ccx: ['first control', 'second control', 'target'] };
+const tick = (ok) => (ok ? '<span class="ok">✓</span>' : '<span class="bad">✕</span>');
+$('pal').innerHTML = PAL.map((p) => (p ? `<button data-g="${p[0]}" class="${p[0] === sel ? 'on' : ''}">${p[1]}</button>` : '<span class="sep"></span>')).join('');
+$('pal').querySelectorAll('button').forEach((b) => (b.onclick = () => { sel = b.dataset.g; pending = null; $('pal').querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b)); hint(); }));
+function hint() { const n = NEED[sel]; $('hint').textContent = n ? (pending ? 'now click the wire for the ' + n[pending.length] : 'click the wire for the ' + n[0] + ', then the ' + n.slice(1).join(', then the ')) : Q.GATES[sel][1] ? 'click a wire, then enter the rotation angle' : 'pick a gate, then click a wire to place it at the end of that wire'; }
+// layout: each gate goes in the first column where all the wires it spans are free
+function layout() { const free = new Array(qubits).fill(0), cols = []; ops.forEach((o, i) => { const lo = Math.min(...o.q), hi = Math.max(...o.q); let c = 0; for (let k = lo; k <= hi; k++) c = Math.max(c, free[k]); for (let k = lo; k <= hi; k++) free[k] = c + 1; cols[i] = c; }); return { cols, width: Math.max(8, ...free.map((x) => x + 1)) }; }
+function draw() { const { cols, width } = layout(), cellAt = {}; ops.forEach((o, i) => o.q.forEach((q, k) => (cellAt[q + ':' + cols[i]] = { o, i, k })));
+  let h = ''; for (let q = 0; q < qubits; q++) { h += `<div class="wire" data-q="${q}"><span class="ql">q${q} |0⟩</span>`; for (let c = 0; c < width; c++) { const x = cellAt[q + ':' + c]; let inner = '<span class="slot"></span>';
+      if (x) { const { o, k } = x, def = Q.GATES[o.g], lo = Math.min(...o.q), hi = Math.max(...o.q), link = o.q.length > 1 && q === lo ? `<span class="link" style="top:50%;height:${(hi - lo) * 54}px"></span>` : '';
+        if (o.g === 'swap') inner = link + '<span class="slot sw">✕</span>'; else if (k < def[3]) inner = link + '<span class="slot"><i class="ctl"></i></span>'; else if (def[3] && def[2] === 'x') inner = link + '<span class="slot"><i class="tgt">+</i></span>';
+        else inner = link + `<span class="slot g ${def[1] ? 'ang' : ''}">${(def[3] ? def[2] : o.g).toUpperCase()}${def[1] ? '<br>' + (o.a / Math.PI).toFixed(2) + 'π' : ''}</span>`; }
+      h += `<span class="cell" data-q="${q}">${inner}</span>`; } h += '</div>'; }
+  $('grid').innerHTML = h; $('grid').querySelectorAll('.cell').forEach((c) => (c.onclick = () => place(+c.dataset.q))); $('qN').textContent = qubits; }
+function place(q) { const def = Q.GATES[sel];
+  if (def[0] === 1) { let a; if (def[1]) { const v = prompt('Rotation angle for ' + sel.toUpperCase() + ' (for example pi/2, pi/4, 0.3)', 'pi/2'); if (v === null) return; try { a = Q.angle(v); } catch (e) { return toast(e.message, true); } } ops.push(def[1] ? { g: sel, q: [q], a } : { g: sel, q: [q] }); }
+  else { pending = pending || []; if (pending.includes(q)) return toast('pick a different wire', true); pending.push(q); if (pending.length < def[0]) return hint(); ops.push({ g: sel, q: pending }); pending = null; }
+  hint(); sync(); }
+function sync() { if (mode === 'build') $('code').value = Q.toText(ops); draw(); compute(); }
+function current() { return mode === 'code' ? Q.parse($('code').value, qubits) : Q.check(ops, qubits); }
+function compute() { let sv; try { sv = Q.run(current(), qubits); } catch (e) { $('probs').innerHTML = `<span class="bad mono" style="font-size:12px">${e.message}</span>`; $('pInfo').textContent = ''; lastProb = null; return; }
+  const p = Q.probabilities(sv); lastProb = p; const rows = Array.from(p, (v, i) => [i, v]).filter((x) => x[1] > 1e-9).sort((a, b) => b[1] - a[1]), shown = rows.slice(0, 16);
+  $('pInfo').textContent = rows.length + ' of ' + num(p.length) + ' states possible'; $('probs').innerHTML = shown.map(([i, v]) => `<div class="pb"><span>|${Q.label(i, qubits)}⟩</span><span class="tr"><i style="width:${(v * 100).toFixed(2)}%"></i></span><span>${(v * 100).toFixed(2)}%</span></div>`).join('') + (rows.length > 16 ? `<div class="cap" style="margin-top:8px">and ${rows.length - 16} more</div>` : '');
+  if (qubits <= 4) { $('ampP').style.display = ''; const f = (x) => (Math.abs(x) < 5e-7 ? '0' : x.toFixed(4)); $('amps').innerHTML = Array.from(sv.re, (re, i) => `<div class="amp"><span>|${Q.label(i, qubits)}⟩</span><span>${f(re)} ${sv.im[i] < -5e-7 ? '−' : '+'} ${f(Math.abs(sv.im[i]))}i</span></div>`).join(''); } else $('ampP').style.display = 'none';
+  $('counts').innerHTML = '<div class="dim" style="font-size:13px;padding:8px 0">The circuit changed. Press measure to sample it again.</div>'; $('cInfo').textContent = 'not measured yet'; }
+function load(k) { const p = Q.PRESETS[k]; qubits = p.qubits; ops = Q.parse(p.text, qubits); $('code').value = p.text; $('pnote').innerHTML = '<b style="color:var(--ice);font-weight:400">' + p.name + '.</b> ' + p.note; pending = null; document.querySelectorAll('#presets .chip').forEach((c) => c.classList.toggle('on', c.dataset.k === k)); draw(); compute(); }
+$('presets').innerHTML = Object.entries(Q.PRESETS).map(([k, p]) => `<button class="chip" data-k="${k}">${p.name}</button>`).join(' '); document.querySelectorAll('#presets .chip').forEach((c) => (c.onclick = () => load(c.dataset.k)));
+$('qPlus').onclick = () => { if (qubits >= (mode === 'build' ? 8 : Q.MAX_QUBITS)) return toast(mode === 'build' ? 'the builder shows up to 8 wires; use code for up to 12' : 'up to 12 qubits', true); qubits++; sync(); };
+$('qMinus').onclick = () => { if (qubits <= 1) return; if (ops.some((o) => o.q.includes(qubits - 1))) return toast('remove the gates on q' + (qubits - 1) + ' first', true); qubits--; sync(); };
+$('undo').onclick = () => { if (mode === 'build') { ops.pop(); pending = null; sync(); } };
+$('clear').onclick = () => { ops = []; pending = null; $('code').value = ''; $('pnote').innerHTML = 'An empty circuit. Every qubit starts in the state 0.'; document.querySelectorAll('#presets .chip').forEach((c) => c.classList.remove('on')); draw(); compute(); };
+$('tBuild').onclick = () => { try { ops = Q.parse($('code').value, qubits); } catch (e) { return toast(e.message, true); } if (qubits > 8) return toast('the builder shows up to 8 wires', true); mode = 'build'; $('tBuild').classList.add('on'); $('tCode').classList.remove('on'); $('vBuild').style.display = ''; $('vCode').style.display = 'none'; sync(); };
+$('tCode').onclick = () => { mode = 'code'; $('code').value = Q.toText(ops); $('tCode').classList.add('on'); $('tBuild').classList.remove('on'); $('vCode').style.display = ''; $('vBuild').style.display = 'none'; };
+$('code').addEventListener('input', compute);
+// measure: the node runs the circuit and samples it; this page re-derives everything before showing a tick
+$('measure').onclick = async () => { let cur; try { cur = current(); } catch (e) { return toast(e.message, true); } if (!lastProb) return; const b = $('measure'), shots = +$('shots').value; b.disabled = true; $('st').textContent = 'sampling on the node…';
+  try { const r = await (await fetch('/api/sim', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ qubits, ops: cur, shots }) })).json(); if (r.error) throw new Error(r.error);
+    const mine = Q.probMap(Q.run(cur, qubits)), sameP = Object.keys(mine).length === Object.keys(r.probabilities).length && Object.keys(mine).every((k) => Math.abs(mine[k] - (r.probabilities[k] || 0)) < 1e-9);
+    const again = Q.countMap(Q.sample(lastProb, shots, r.sampleKey), qubits), sameC = JSON.stringify(Object.entries(again).sort()) === JSON.stringify(Object.entries(r.counts).sort());
+    const bound = r.receipt.circuit === Q.circuitDigest(cur, qubits) && r.receipt.counts === Q.countsDigest(r.counts), sig = verifySig(Q.simMessage(r.receipt), r.sig, r.nodeKey);
+    const rows = Object.entries(r.counts).sort((a, b) => b[1] - a[1]), top = rows.slice(0, 16), max = rows[0][1];
+    $('cInfo').textContent = num(shots) + ' shots'; $('counts').innerHTML = top.map(([k, v]) => `<div class="pb"><span>|${k}⟩</span><span class="tr"><i class="c" style="width:${(v / max * 100).toFixed(2)}%"></i></span><span>${num(v)}</span></div>`).join('') + (rows.length > 16 ? `<div class="cap" style="margin-top:8px">and ${rows.length - 16} more</div>` : '')
+      + `<div style="margin-top:12px;border-top:1px solid var(--line);padding-top:10px"><div class="chk">${tick(sameP)}<b>the node's probabilities match this page's own simulation</b></div><div class="chk">${tick(sameC)}<b>counts re-derived here from the node's sampling key</b></div><div class="chk">${tick(bound && sig)}<b>receipt signed by the node for this circuit and these counts</b></div><div class="chk dim">${r.receipt.quantumBytes} fresh quantum bytes from ${r.quantumSource.join(' + ') || 'the pool'} seeded the sampling · beacon round #${num(r.receipt.round)}</div></div>`;
+    $('st').textContent = ''; } catch (e) { $('st').textContent = ''; toast(String(e.message || e), true); } b.disabled = false; };
+hint(); load('bell');
+</script></body></html>

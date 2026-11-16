@@ -8,9 +8,9 @@ const fs = require('fs'), path = require('path'), len = (s) => [...s].length;
 const L = require('./lib.cjs');
 // set X and SITE in lib.cjs once the handle and the domain exist: tweets in LINK then carry the site link
 const SITE = L.SITE ? 'https://' + L.SITE.replace(/^https?:\/\//, '') : '', HANDLE = L.X || '(handle not set yet)', NAME = 'VOID | $VOID';
-const LINK = new Set(['Key art', 'QaaS', 'The round (video)', 'Fair draws', 'Key Forge (video)', 'Entropy API', 'Launch (fill CA)']);
+const LINK = new Set(['Key art', 'QaaS', 'Simulator', 'The round (video)', 'Fair draws', 'Key Forge (video)', 'Entropy API', 'Launch (fill CA)']);
 const BIO = 'Quantum-as-a-Service for Web3. Real quantum entropy over an open API: a public beacon, private bytes, fair draws and a Key Forge. QaaS. $VOID';
-const DEX = 'VOID is Quantum-as-a-Service (QaaS) for Web3: real quantum entropy over an open API. Its node pulls raw random bytes from a photonic quantum random number generator, mixes them with the NIST Randomness Beacon and drand, and publishes a signed, hash-chained beacon round every 10 seconds with every input printed, so anyone can recompute it. An open API serves private entropy with signed receipts, raw quantum bytes that are each delivered once, and provably fair draws and shuffles. The Key Forge builds a wallet in the browser from node entropy mixed with the device\'s own: a 24-word phrase, Ethereum and Solana addresses, and ML-DSA-65 and ML-KEM-768 post-quantum key pairs. The node never sees the keys.';
+const DEX = 'VOID is Quantum-as-a-Service (QaaS) for Web3: real quantum entropy over an open API. Its node pulls raw random bytes from a photonic quantum random number generator, mixes them with the NIST Randomness Beacon and drand, and publishes a signed, hash-chained beacon round every 10 seconds with every input printed, so anyone can recompute it. An open API serves private entropy with signed receipts, raw quantum bytes that are each delivered once, and provably fair draws and shuffles. A circuit simulator runs quantum circuits exactly and samples their measurements with quantum entropy. The Key Forge builds a wallet in the browser from node entropy mixed with the device\'s own: a 24-word phrase, Ethereum and Solana addresses, and ML-DSA-65 and ML-KEM-768 post-quantum key pairs. The node never sees the keys.';
 const T = [
 ['Pinned · hype (video)', 'void-hype-14s.mp4', `Every wallet you own started as one random number.
 
@@ -24,9 +24,16 @@ $VOID`],
 VOID makes it with physics. Quantum-as-a-Service: real quantum hardware behind an open API, with a public beacon anyone can check.
 
 $VOID`],
-['QaaS', 'void-g13-qaas.png', `Quantum-as-a-Service, in one line: the quantum hardware is our problem and the result is your HTTP call.
+['QaaS', 'void-g13-qaas.png', `Quantum-as-a-Service in one line: the hardware is our problem and the result is your HTTP call.
 
-Five services behind one API: a beacon, private entropy, raw quantum bytes, fair draws and a Key Forge. No key. No account.
+Six services, one API: beacon, entropy, raw quantum bytes, fair draws, a circuit simulator and a Key Forge. No key. No account.
+
+$VOID`],
+['Simulator', 'void-g14-sim.png', `VOID runs quantum circuits.
+
+Build one in your browser: Bell pairs, Grover search, the Fourier transform behind Shor's algorithm. When you measure, real photons pick the outcome and the node signs the counts.
+
+QaaS, compute included.
 
 $VOID`],
 ['The problem', 'void-g02-problem.png', `Weak randomness has already cost crypto real money.
@@ -106,7 +113,7 @@ Fresh quantum bytes go into every response, the node signs a receipt, and you ne
 $VOID`],
 ['Roadmap', 'void-g11-roadmap.png', `Where VOID goes from here.
 
-The node, the beacon and the Key Forge are live. Next: rounds posted on Solana for programs to read, a second quantum device and independent operators.
+The node, the beacon, the simulator and the Key Forge are live. Next: rounds posted on Solana for programs to read, a second quantum device and independent operators.
 
 One node today. A network next.
 

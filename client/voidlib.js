@@ -58,6 +58,8 @@ export function verifyReceipt(resp, nodeKeyHex) {
   add('receipt signed by the node key', sig);
   return { ok: checks.every((c) => c.ok), checks };
 }
+// ---- simulator receipts: checked in qsim.js terms by the caller; the signature check lives here ----
+export function verifySig(messageBytes, sigHex, nodeKeyHex) { try { return ed25519.verify(unhex(sigHex), messageBytes, unhex(nodeKeyHex)); } catch (e) { return false; } }
 // ---- statistical health of a byte sample (the same tests the node runs on what its quantum sources send) ----
 export function health(bytes) {
   const n = bytes.length; if (n < 64) return null;

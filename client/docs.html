@@ -6,10 +6,10 @@
 .prose table{margin:0 0 18px;border:1px solid var(--line);background:var(--carbon)}.prose li{color:var(--fog);margin:0 0 8px 20px;max-width:740px}.prose b{color:var(--ice);font-weight:500}.prose h3{scroll-margin-top:100px}</style></head><body>
 <main class="app"><div class="wrap">
   <div class="pagehead"><h1>Docs</h1><span class="pill"><i></i>node key <b id="nk" style="color:var(--ice);font-weight:400;margin-left:6px">…</b></span></div>
-  <div class="toc"><a href="#overview">overview</a><a href="#sources">sources</a><a href="#pool">pool and reservoir</a><a href="#beacon">beacon</a><a href="#draws">draws</a><a href="#entropy">entropy</a><a href="#forge">key forge</a><a href="#api">api</a><a href="#verify">verify it yourself</a><a href="#token">token</a></div>
+  <div class="toc"><a href="#overview">overview</a><a href="#sources">sources</a><a href="#pool">pool and reservoir</a><a href="#beacon">beacon</a><a href="#draws">draws</a><a href="#entropy">entropy</a><a href="#sim">simulator</a><a href="#forge">key forge</a><a href="#api">api</a><a href="#verify">verify it yourself</a><a href="#token">token</a></div>
   <div class="prose">
     <h3 id="overview">Overview</h3>
-    <p>VOID is Quantum-as-a-Service (QaaS): a node that sits in front of quantum hardware and turns its measurements into randomness Web3 can use and check, over plain HTTP. It does four things: it publishes a <b>public beacon</b> every 10 seconds, it serves <b>private entropy</b> on request, it computes <b>provably fair draws</b> from beacon rounds, and it supplies the node half of the <b>Key Forge</b>, which makes wallets in your browser.</p>
+    <p>VOID is Quantum-as-a-Service (QaaS): a node that sits in front of quantum hardware and turns its measurements into randomness Web3 can use and check, over plain HTTP. It does five things: it publishes a <b>public beacon</b> every 10 seconds, it serves <b>private entropy</b> on request, it computes <b>provably fair draws</b> from beacon rounds, it runs <b>quantum circuits</b> and samples their measurements with quantum entropy, and it supplies the node half of the <b>Key Forge</b>, which makes wallets in your browser.</p>
     <p>One file, <code>client/voidlib.js</code>, holds every rule a third party needs to re-check the node's work. The node imports the same file, so the published rules and the running code cannot drift apart.</p>
 
     <h3 id="sources">Sources</h3>
@@ -45,6 +45,17 @@ the largest multiple of the range, then reduced modulo the range</pre>
     <p>Up to 32 fresh quantum bytes go into each request and are removed from the reservoir. The response states how many were used. It also carries a <b>receipt</b>: the request id, time, beacon round, byte counts and the SHA3-256 digest of the bytes, signed by the node. The receipt lets you prove later what the node gave you without revealing it.</p>
     <p><code>/api/quantum</code> returns bytes exactly as the device produced them, with no hashing, up to 64 at a time. They are removed from the reservoir on delivery.</p>
 
+    <h3 id="sim">Simulator</h3>
+    <p>The <a href="/sim" style="color:var(--hi)">simulator</a> runs quantum circuits exactly. A circuit on <code>n</code> qubits is held as <code>2^n</code> complex amplitudes, starting from the state where every qubit is 0, and each gate is applied to them in order. It supports up to 12 qubits, 400 gates and 8,192 shots.</p>
+    <table><tr><td>one qubit</td><td><code>h x y z s sdg t tdg</code>, and the rotations <code>rx(θ) ry(θ) rz(θ) p(θ)</code></td></tr><tr><td>controlled</td><td><code>cx cy cz ch</code>, <code>cp(θ) crz(θ)</code>, and the Toffoli gate <code>ccx</code></td></tr><tr><td>other</td><td><code>swap</code></td></tr><tr><td>angles</td><td>numbers and <code>pi</code> joined by <code>*</code> and <code>/</code>, such as <code>pi/2</code> or <code>-pi/4</code></td></tr></table>
+    <p>Gates are deterministic. The one random step is measurement, and that is where the node comes in. For a sampled run it derives a 32-byte sampling key by HKDF from fresh quantum bytes, the pool and local bytes, then draws each shot:</p>
+    <pre>block i = HMAC-SHA512( key = sampling key, message = "VOID-SIM-v1|" + i )
+each block gives ten 48-bit values; value / 2^48 picks a basis state
+by its cumulative probability</pre>
+    <p>The response returns the probabilities, the counts, the sampling key and a signed receipt binding the circuit and the counts. With the key you can re-derive the counts yourself, which is what the simulator page does before it shows a tick. Basis states are written with qubit 0 on the right.</p>
+    <pre>curl -X POST <span class="o"></span>/api/sim -H "content-type: application/json" \
+  -d '{"qubits":2,"code":"h 0\ncx 0 1","shots":1024}'</pre>
+
     <h3 id="forge">Key Forge</h3>
     <p>The <a href="/forge" style="color:var(--hi)">Forge</a> requests 64 bytes from <code>/api/entropy</code>, checks the receipt, draws 64 more from your browser's own generator and computes <code>SHA3-512("VOID-FORGE-v1" | node bytes | local bytes)</code>. The first 32 bytes of the result become a 24-word BIP-39 recovery phrase. From the phrase it derives:</p>
     <table><tr><td>EVM</td><td>secp256k1 at <code>m/44'/60'/0'/0/0</code>, the first account in Rabby and MetaMask.</td></tr><tr><td>Solana</td><td>ed25519 by SLIP-0010 at <code>m/44'/501'/0'/0'</code>, the first account in Phantom.</td></tr><tr><td>ML-DSA-65</td><td>A post-quantum signature key pair (FIPS 204), derived from the other 32 bytes by HKDF. The page signs and verifies a message with it as a self-test.</td></tr><tr><td>ML-KEM-768</td><td>A post-quantum key-exchange key pair (FIPS 203), derived the same way.</td></tr></table>
@@ -59,6 +70,7 @@ GET /api/draw?round&seed&min&max&count      whole numbers in [min, max], up to 1
 GET /api/shuffle?round&seed&n               a shuffled order of 0 … n-1, n up to 10000
 GET /api/entropy?bytes=32                   1 to 1024 private bytes with a signed receipt
 GET /api/quantum?bytes=32                   1 to 64 raw device bytes, served once
+POST /api/sim  { qubits, code, shots }      run a circuit, sample it with quantum entropy
 GET /api/stats                              counters, reservoir, sources, health tests
 GET /api/config                             node key, round length, limits, token</pre>
     <p>All responses are JSON and allow cross-origin requests. <code>round</code> defaults to the latest round. Limits per address: 120 entropy requests a minute and 30 raw requests a minute. The node keeps the latest 3,000 rounds; older indexes return 410.</p>

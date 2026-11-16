@@ -6,6 +6,7 @@ Object.assign(process.env, { PORT: '8395', DATA_PATH: tmp, ROUND_SEC: '1', LFD_E
 const S = await import('../server/index.js');
 const L = await import('../client/voidlib.js');
 const F = await import('../client/forge-lib.js');
+const Q = await import('../client/qsim.js');
 const B = 'http://127.0.0.1:8395';
 let pass = 0, fail = 0, skip = 0;
 const ok = (name, cond, extra) => { if (cond) { pass++; console.log('PASS', name); } else { fail++; console.log('FAIL', name, extra === undefined ? '' : JSON.stringify(extra).slice(0, 300)); } };
@@ -15,7 +16,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 await S.start(); await sleep(4500);
 // ---- pages ----
-for (const p of ['/', '/console', '/forge', '/docs']) { const r = await fetch(B + p), t = await r.text(); ok('page ' + p + ' serves with no template tokens left', r.status === 200 && t.includes('VOID') && !/\{\{[A-Z_]+\}\}/.test(t)); }
+for (const p of ['/', '/console', '/sim', '/forge', '/docs']) { const r = await fetch(B + p), t = await r.text(); ok('page ' + p + ' serves with no template tokens left', r.status === 200 && t.includes('VOID') && !/\{\{[A-Z_]+\}\}/.test(t)); }
 ok('unknown page is a 404', (await fetch(B + '/nope')).status === 404);
 ok('path traversal out of the site folder is blocked', (await fetch(B + '/..%2fserver/index.js')).status !== 200 && (await fetch(B + '/vendor/..%2f..%2fserver/index.js')).status !== 200);
 ok('crypto libraries are served to the browser', (await fetch(B + '/vendor/@noble/hashes/esm/sha3.js')).status === 200 && (await fetch(B + '/vendor/@noble/post-quantum/node_modules/@noble/hashes/esm/_assert.js')).status === 200);
@@ -79,6 +80,35 @@ ok('the raw endpoint is rate limited per address', limited > 0, limited);
 // ---- health statistics ----
 const bad = L.health(new Uint8Array(2048).fill(0x55)), good = L.health((() => { const b = new Uint8Array(4096); crypto.getRandomValues(b); return b; })());
 ok('health tests fail a patterned sample and pass a random one', bad.pass === false && good.pass === true, { bad, good });
+// ---- simulator: the engine ----
+const pm = (code, n) => Q.probMap(Q.run(Q.parse(code, n), n)), near = (a, b) => Math.abs(a - b) < 1e-9;
+const bell = pm('h 0\ncx 0 1', 2); ok('sim: a Bell pair is 00 or 11, half each', Object.keys(bell).sort().join() === '00,11' && near(bell['00'], 0.5) && near(bell['11'], 0.5), bell);
+const ghz = pm('h 0; cx 0 1; cx 1 2', 3); ok('sim: a GHZ state is 000 or 111', Object.keys(ghz).sort().join() === '000,111' && near(ghz['000'], 0.5));
+ok('sim: Grover search finds the marked item with certainty', near(pm(Q.PRESETS.grover.text, 2)['11'], 1), pm(Q.PRESETS.grover.text, 2));
+ok('sim: interference cancels a path (H Z H gives 1)', near(pm('h 0; z 0; h 0', 1)['1'], 1) && near(pm('h 0; h 0', 1)['0'], 1));
+ok('sim: X flips, and qubit 0 is the rightmost bit', near(pm('x 0', 3)['001'], 1) && near(pm('x 2', 3)['100'], 1));
+ok('sim: Toffoli flips the target only when both controls are 1', near(pm('x 0; x 1; ccx 0 1 2', 3)['111'], 1) && near(pm('x 0; ccx 0 1 2', 3)['001'], 1));
+ok('sim: swap exchanges two qubits', near(pm('x 0; swap 0 2', 3)['100'], 1));
+ok('sim: the Fourier transform of a basis state is uniform', Object.values(pm(Q.PRESETS.qft.text, 3)).every((v) => near(v, 0.125)));
+ok('sim: rotations follow the textbook (RY(pi/2) is a fair coin, RX(pi) is a flip)', near(pm('ry(pi/2) 0', 1)['1'], 0.5) && near(pm('rx(pi) 0', 1)['1'], 1));
+const busy = Q.run(Q.parse('h 0;h 1;h 2;h 3;rx(0.3) 0;ry(1.1) 1;rz(2) 2;cx 0 3;ccx 0 1 2;swap 1 3;cp(pi/3) 2 0;t 3;sdg 1;cy 0 2;ch 3 1;crz(0.7) 1 0', 4), 4);
+ok('sim: total probability stays 1 through every gate type', near(Q.probabilities(busy).reduce((a, b) => a + b, 0), 1));
+ok('sim: twelve qubits run (4,096 amplitudes)', near(Q.probabilities(Q.run(Q.parse(Array.from({ length: 12 }, (_, i) => 'h ' + i).join(';'), 12), 12)).reduce((a, b) => a + b, 0), 1));
+const throws = (f) => { try { f(); return false; } catch (e) { return true; } };
+ok('sim: bad circuits are refused with a reason', throws(() => Q.parse('foo 0', 2)) && throws(() => Q.parse('cx 0 0', 2)) && throws(() => Q.parse('h 5', 2)) && throws(() => Q.parse('rx 0', 1)) && throws(() => Q.parse('h 0', 13)) && throws(() => Q.angle('alert(1)')));
+ok('sim: angles parse (pi/2, -pi/4, 2*pi)', near(Q.angle('pi/2'), Math.PI / 2) && near(Q.angle('-pi/4'), -Math.PI / 4) && near(Q.angle('2*pi'), 2 * Math.PI));
+// ---- simulator: the API ----
+const sim = (b) => fetch(B + '/api/sim', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(b) }).then(async (r) => { const j = await r.json(); j.__status = r.status; return j; });
+const s1 = await sim({ qubits: 2, code: 'h 0\ncx 0 1', shots: 2000 }), s2 = await sim({ qubits: 2, code: 'h 0\ncx 0 1', shots: 2000 });
+ok('sim api: counts add up to the shots and land only on possible outcomes', Object.values(s1.counts).reduce((a, b) => a + b, 0) === 2000 && Object.keys(s1.counts).every((k) => k === '00' || k === '11'), s1.counts);
+ok('sim api: a Bell pair measures about half and half', s1.counts['00'] > 850 && s1.counts['00'] < 1150, s1.counts);
+ok('sim api: the counts can be re-derived from the sampling key', JSON.stringify(Q.countMap(Q.sample(Q.probabilities(Q.run(Q.parse('h 0\ncx 0 1', 2), 2)), 2000, s1.sampleKey), 2)) === JSON.stringify(s1.counts));
+ok('sim api: every run uses a new sampling key', s1.sampleKey !== s2.sampleKey && JSON.stringify(s1.counts) !== JSON.stringify(s2.counts));
+ok('sim api: the receipt is signed and binds the circuit and the counts', L.verifySig(Q.simMessage(s1.receipt), s1.sig, cfg.nodeKey) && s1.receipt.circuit === Q.circuitDigest(Q.parse('h 0\ncx 0 1', 2), 2) && s1.receipt.counts === Q.countsDigest(s1.counts));
+ok('sim api: a receipt with altered counts is rejected', !L.verifySig(Q.simMessage({ ...s1.receipt, counts: Q.countsDigest({ '00': 2000 }) }), s1.sig, cfg.nodeKey));
+if (quantumLive) ok('sim api: the sampling was seeded with fresh quantum bytes', s1.receipt.quantumBytes === 32 && s1.quantumSource.includes('lfd'), s1.receipt); else skipT('sim quantum seed', 'LfD QRNG unreachable');
+const s0 = await sim({ qubits: 3, ops: [{ g: 'h', q: [0] }, { g: 'cx', q: [0, 2] }], shots: 0 }); ok('sim api: shots 0 returns the exact state only', s0.__status === 200 && !s0.counts && s0.amplitudes.length === 8 && near(s0.probabilities['101'], 0.5), s0);
+ok('sim api: limits and bad input are refused', (await sim({ qubits: 13, code: 'h 0' })).__status === 400 && (await sim({ qubits: 2, code: 'h 0', shots: 99999 })).__status === 400 && (await sim({ qubits: 2, code: 'nope 0' })).__status === 400 && (await fetch(B + '/api/sim')).status === 405);
 // ---- Key Forge ----
 const v = F.fromMnemonic('abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about');
 ok('EVM derivation matches the standard test vector', v.evm.address === '0x9858EfFD232B4033E47d90003D41EC34EcaEda94', v.evm.address);

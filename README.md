@@ -6,6 +6,7 @@ Quantum-as-a-Service (QaaS) for Web3: real quantum entropy over an open API. One
 - **Entropy API.** Private random bytes with a signed receipt. Fresh quantum bytes go into every response.
 - **Raw quantum bytes.** Device output with no hashing. Each byte is served once.
 - **Provably fair draws and shuffles.** A pure function of a beacon round and a seed you choose.
+- **Circuit simulator.** An exact statevector simulator for up to 12 qubits with a visual builder. Measurements are sampled with quantum entropy, and the node signs the counts.
 - **Key Forge.** A wallet built in the browser from node entropy mixed with the device's own: a 24-word phrase, Ethereum and Solana addresses, and ML-DSA-65 and ML-KEM-768 key pairs. The node never sees the keys.
 
 ## Run it
@@ -24,8 +25,9 @@ Node 22 or newer. The server itself uses only Node's standard library; the depen
 |---|---|
 | `server/index.js` | The node: sources, pool, reservoir, beacon, HTTP API, static site |
 | `client/voidlib.js` | The protocol rules, shared by the node and the browser: round hashing, verification, draws, receipts, health tests |
+| `client/qsim.js` | The circuit simulator: gates, parser, sampling, presets |
 | `client/forge-lib.js` | Key Forge derivations |
-| `client/*.html` | Landing page, console, Key Forge, docs |
+| `client/*.html` | Landing page, console, simulator, Key Forge, docs |
 | `test/run.js` | The test suite |
 
 ## Sources
