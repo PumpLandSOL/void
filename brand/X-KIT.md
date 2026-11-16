@@ -20,6 +20,11 @@ Quantum-as-a-Service for Web3. Real quantum entropy over an open API: a public b
 VOID is Quantum-as-a-Service (QaaS) for Web3: real quantum entropy over an open API. Its node pulls raw random bytes from a photonic quantum random number generator, mixes them with the NIST Randomness Beacon and drand, and publishes a signed, hash-chained beacon round every 10 seconds with every input printed, so anyone can recompute it. An open API serves private entropy with signed receipts, raw quantum bytes that are each delivered once, and provably fair draws and shuffles. A circuit simulator runs quantum circuits exactly and samples their measurements with quantum entropy. The Key Forge builds a wallet in the browser from node entropy mixed with the device's own: a 24-word phrase, Ethereum and Solana addresses, and ML-DSA-65 and ML-KEM-768 post-quantum key pairs. The node never sees the keys.
 ```
 
+## Website
+```
+https://voidqaas.xyz
+```
+
 ## Profile images
 - Avatar: `void-pfp.png`
 - Header: `void-banner.png`
@@ -47,22 +52,26 @@ VOID makes it with physics. Quantum-as-a-Service: real quantum hardware behind a
 $VOID
 ```
 
-### 3. QaaS · 231 chars · media: `void-g13-qaas.png`
+### 3. QaaS · 245 chars · media: `void-g13-qaas.png`
 ```
 Quantum-as-a-Service in one line: the hardware is our problem and the result is your HTTP call.
 
-Six services, one API: beacon, entropy, raw quantum bytes, fair draws, a circuit simulator and a Key Forge. No key. No account.
+Six services, one API: beacon, entropy, raw quantum bytes, fair draws, a simulator and a Key Forge. No key. No account.
+
+https://voidqaas.xyz
 
 $VOID
 ```
 
-### 4. Simulator · 240 chars · media: `void-g14-sim.png`
+### 4. Simulator · 232 chars · media: `void-g14-sim.png`
 ```
 VOID runs quantum circuits.
 
-Build one in your browser: Bell pairs, Grover search, the Fourier transform behind Shor's algorithm. When you measure, real photons pick the outcome and the node signs the counts.
+Build one in your browser: Bell pairs, Grover search, the Fourier transform behind Shor's algorithm. When you measure, real photons pick the outcome.
 
 QaaS, compute included.
+
+https://voidqaas.xyz
 
 $VOID
 ```
@@ -98,11 +107,13 @@ The node pulls 1,024 of them every 20 seconds and shows you the tests they pass.
 $VOID
 ```
 
-### 8. The round (video) · 191 chars · media: `void-round-14s.mp4`
+### 8. The round (video) · 213 chars · media: `void-round-14s.mp4`
 ```
 Every 10 seconds VOID publishes a round: 32 quantum bytes, a NIST pulse, a drand round, one hash, one signature.
 
 Every input is printed, so you can recompute the whole thing yourself.
+
+https://voidqaas.xyz
 
 $VOID
 ```
@@ -116,11 +127,13 @@ VOID shows its working. Each round prints what went in, is signed by the node an
 $VOID
 ```
 
-### 10. Fair draws · 215 chars · media: `void-g05-draw.png`
+### 10. Fair draws · 237 chars · media: `void-g05-draw.png`
 ```
 Running a raffle, a mint or an airdrop? Name a VOID round before it exists, pick a seed, then draw.
 
 Nobody could have known the result, including us, and anyone can recompute it. That's what fair looks like.
+
+https://voidqaas.xyz
 
 $VOID
 ```
@@ -185,11 +198,13 @@ VOID isn't selling the word. It serves real quantum bytes over an open API today
 $VOID
 ```
 
-### 17. Entropy API · 208 chars · media: `void-g10-api.png`
+### 17. Entropy API · 230 chars · media: `void-g10-api.png`
 ```
 This is what QaaS looks like: one call to VOID returns 32 bytes that nobody else will ever receive.
 
 Fresh quantum bytes go into every response, the node signs a receipt, and you need no key to use it.
+
+https://voidqaas.xyz
 
 $VOID
 ```
@@ -205,7 +220,7 @@ One node today. A network next.
 $VOID
 ```
 
-### 19. Launch (fill CA) · 214 chars · media: `void-g12-live.png`
+### 19. Launch (fill CA) · 236 chars · media: `void-g12-live.png`
 ```
 $VOID is live on Solana.
 
@@ -214,6 +229,8 @@ Quantum-as-a-Service: a beacon round every 10 seconds, an open entropy API, wall
 Chainlink sells randomness at a $6.98B market cap. This is day one.
 
 CA:
+
+https://voidqaas.xyz
 
 $VOID
 ```

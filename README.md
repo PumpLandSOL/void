@@ -59,7 +59,7 @@ The node's signing key is created on first start and stored in the data file. Ke
 ```js
 import { verifyRound, draw } from './client/voidlib.js';
 
-const base = 'http://localhost:8294';
+const base = 'https://voidqaas.xyz';
 const { nodeKey } = await (await fetch(base + '/api/config')).json();
 const r    = await (await fetch(base + '/api/beacon/12')).json();
 const prev = await (await fetch(base + '/api/beacon/11')).json();
