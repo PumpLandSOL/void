@@ -25,4 +25,4 @@ export function chrome(links = APP, cta = ['/console', 'open console ↗']) {
     $('footx').innerHTML = (c.ghUrl ? `· <a href="${c.ghUrl}" target="_blank" rel="noopener">GitHub</a> ` : '') + `· <a href="${c.xUrl}" target="_blank" rel="noopener">X</a> · <a href="/docs">Docs</a>`; }).catch(() => {});
   return h;
 }
-export function caBar(el, token) { if (!el) return; const mint = token && token.mint; el.innerHTML = `<span class="cap">$VOID</span><code>${mint || 'launching on ' + ((token && token.chain) || 'chain')}</code>`; el.onclick = () => mint && copy(mint, '$VOID address'); }
+export function caBar(el, token) { if (!el) return; const mint = token && token.mint; el.innerHTML = `<span class="cap">$VOID</span><code>${mint || 'launching on ' + (token && token.chain === 'Solana' ? 'pump.fun' : (token && token.chain) || 'chain')}</code>`; el.onclick = () => mint && copy(mint, '$VOID address'); }

@@ -20,7 +20,7 @@ try { for (const l of fs.readFileSync(path.join(ROOT, '.env'), 'utf8').split(/\r
 const SITE_URL = (process.env.SITE_URL || 'http://localhost:8294').replace(/\/$/, '');
 const X_URL = process.env.X_URL || 'https://x.com';
 const GH_URL = process.env.GH_URL || '';
-const TOKEN_CHAIN = process.env.TOKEN_CHAIN || 'Robinhood Chain';
+const TOKEN_CHAIN = process.env.TOKEN_CHAIN || 'Solana';
 const VOID_MINT = process.env.VOID_MINT || '';
 
 const PORT = +(process.env.PORT || 8294);
