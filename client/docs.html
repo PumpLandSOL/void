@@ -1,0 +1,89 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VOID Docs · beacon, entropy API, Key Forge</title>
+<meta name="description" content="How the VOID node sources quantum bytes, builds beacon rounds, serves entropy and provably fair draws, and how to verify every part yourself.">
+<link rel="icon" href="/favicon.svg"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Geist+Mono:wght@400&display=swap" rel="stylesheet"><link rel="stylesheet" href="/style.css">
+<style>.toc{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}.toc a{font:400 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--fog);border:1px solid var(--line2);border-radius:999px;padding:6px 12px}.toc a:hover{color:var(--ice);border-color:var(--hi)}
+.prose table{margin:0 0 18px;border:1px solid var(--line);background:var(--carbon)}.prose li{color:var(--fog);margin:0 0 8px 20px;max-width:740px}.prose b{color:var(--ice);font-weight:500}.prose h3{scroll-margin-top:100px}</style></head><body>
+<main class="app"><div class="wrap">
+  <div class="pagehead"><h1>Docs</h1><span class="pill"><i></i>node key <b id="nk" style="color:var(--ice);font-weight:400;margin-left:6px">…</b></span></div>
+  <div class="toc"><a href="#overview">overview</a><a href="#sources">sources</a><a href="#pool">pool and reservoir</a><a href="#beacon">beacon</a><a href="#draws">draws</a><a href="#entropy">entropy</a><a href="#forge">key forge</a><a href="#api">api</a><a href="#verify">verify it yourself</a><a href="#token">token</a></div>
+  <div class="prose">
+    <h3 id="overview">Overview</h3>
+    <p>VOID is a node that turns quantum measurements into randomness Web3 can use and check. It does four things: it publishes a <b>public beacon</b> every 10 seconds, it serves <b>private entropy</b> on request, it computes <b>provably fair draws</b> from beacon rounds, and it supplies the node half of the <b>Key Forge</b>, which makes wallets in your browser.</p>
+    <p>One file, <code>client/voidlib.js</code>, holds every rule a third party needs to re-check the node's work. The node imports the same file, so the published rules and the running code cannot drift apart.</p>
+
+    <h3 id="sources">Sources</h3>
+    <table><tr><td>LfD QRNG</td><td>Quantum device. An ID Quantique Quantis photonic quantum random number generator run by the Laboratory for Digitalisation at OTH Regensburg. The node pulls 1,024 raw bytes every 20 seconds.</td></tr><tr><td>ANU QRNG</td><td>Quantum device. Measures vacuum fluctuations of the electromagnetic field at the Australian National University. Used when the node operator sets an API key.</td></tr><tr><td>NIST Beacon</td><td>Public beacon. A signed 512-bit pulse every 60 seconds from the US National Institute of Standards and Technology.</td></tr><tr><td>drand</td><td>Public beacon. Threshold randomness produced jointly by the League of Entropy.</td></tr><tr><td>Local</td><td>The operating system's cryptographic generator, used for the node's own contribution.</td></tr></table>
+    <p>The node runs four statistical tests on the latest 4,096 bytes from its quantum devices: the share of 1 bits, a runs test, a chi-square test over byte values and serial correlation, plus a Shannon entropy estimate. The <a href="/console" style="color:var(--hi)">console</a> shows the results and the status of every source.</p>
+
+    <h3 id="pool">Pool and reservoir</h3>
+    <p>The <b>pool</b> is 64 bytes of secret state. Each input is absorbed with <code>pool = SHA3-512(pool | lengths | tag | bytes)</code>. Hashing only ever adds uncertainty, so a weak or unavailable source cannot make the pool worse. The pool never leaves the node.</p>
+    <p>The <b>reservoir</b> holds raw quantum bytes that have not been used yet, up to 32,768 of them. A byte leaves the reservoir exactly once: into one beacon round, one entropy response or one raw response. Nothing is served twice.</p>
+
+    <h3 id="beacon">Beacon</h3>
+    <p>A round is produced every 10 seconds and contains all of its own inputs:</p>
+    <pre>output = SHA3-512( "VOID-BEACON-v1" | index | time | previous output
+                   | quantum bytes | node value | NIST value | drand value )
+sig    = ed25519( "VOID-ROUND-v1" | index | output )      signed with the node key</pre>
+    <p>Integers are 8-byte big-endian. The four variable inputs are each prefixed with a 4-byte length, so two different sets of inputs can never produce the same message.</p>
+    <table><tr><td>quantum</td><td>32 raw bytes taken from the reservoir for this round, printed in hex, with the device they came from.</td></tr><tr><td>local</td><td>The node's own 32-byte value. The previous round published its SHA3-256 hash as <code>commitNext</code>, so the node fixed it before this round's outside values existed.</td></tr><tr><td>nist, drand</td><td>The latest NIST pulse and drand round the node has seen in the last two minutes, with their public indexes so you can look them up at the source.</td></tr><tr><td>prev</td><td>The output of the previous round. Changing any past round would change every round after it.</td></tr></table>
+    <p>The node cannot steer a round toward a result it likes: its own value is committed one round ahead, and the NIST and drand values are produced by parties it does not control.</p>
+
+    <h3 id="draws">Draws and shuffles</h3>
+    <p>A draw is a pure function of a round's output and a seed you choose:</p>
+    <pre>block i = HMAC-SHA512( key = round output, message = "VOID-DRAW-v1|" + seed + "|" + i )
+each block gives ten 48-bit values; a value is kept only if it is below
+the largest multiple of the range, then reduced modulo the range</pre>
+    <p>Rejecting values above the last full multiple removes modulo bias, so every number in the range is exactly as likely as any other. A shuffle is a Fisher-Yates shuffle over the same stream.</p>
+    <p>For a draw nobody can front-run: publish the round number and the seed <b>before</b> the round exists, then call the endpoint once it does. Asking for a future round returns status 425 with the seconds left.</p>
+
+    <h3 id="entropy">Entropy and raw bytes</h3>
+    <p><code>/api/entropy</code> returns bytes for secrets: keys, nonces, salts. Each response is</p>
+    <pre>HKDF-SHA-512( input = fresh quantum bytes | pool | 32 local bytes,
+              salt  = latest beacon output,
+              info  = "VOID-ENTROPY-v1|" + request id )</pre>
+    <p>Up to 32 fresh quantum bytes go into each request and are removed from the reservoir. The response states how many were used. It also carries a <b>receipt</b>: the request id, time, beacon round, byte counts and the SHA3-256 digest of the bytes, signed by the node. The receipt lets you prove later what the node gave you without revealing it.</p>
+    <p><code>/api/quantum</code> returns bytes exactly as the device produced them, with no hashing, up to 64 at a time. They are removed from the reservoir on delivery.</p>
+
+    <h3 id="forge">Key Forge</h3>
+    <p>The <a href="/forge" style="color:var(--hi)">Forge</a> requests 64 bytes from <code>/api/entropy</code>, checks the receipt, draws 64 more from your browser's own generator and computes <code>SHA3-512("VOID-FORGE-v1" | node bytes | local bytes)</code>. The first 32 bytes of the result become a 24-word BIP-39 recovery phrase. From the phrase it derives:</p>
+    <table><tr><td>EVM</td><td>secp256k1 at <code>m/44'/60'/0'/0/0</code>, the first account in Rabby and MetaMask.</td></tr><tr><td>Solana</td><td>ed25519 by SLIP-0010 at <code>m/44'/501'/0'/0'</code>, the first account in Phantom.</td></tr><tr><td>ML-DSA-65</td><td>A post-quantum signature key pair (FIPS 204), derived from the other 32 bytes by HKDF. The page signs and verifies a message with it as a self-test.</td></tr><tr><td>ML-KEM-768</td><td>A post-quantum key-exchange key pair (FIPS 203), derived the same way.</td></tr></table>
+    <p>All of this runs in the page. The node learns that someone asked for 64 bytes and nothing else. The cryptography comes from the audited noble and scure libraries, served from this node.</p>
+
+    <h3 id="api">API</h3>
+    <pre>GET /api/beacon/latest                      the newest round
+GET /api/beacon/:index                      one round (425 if it does not exist yet)
+GET /api/beacon?limit=20                    recent rounds, newest first (max 100)
+GET /api/stream                             server-sent events, one message per round
+GET /api/draw?round&seed&min&max&count      whole numbers in [min, max], up to 1000
+GET /api/shuffle?round&seed&n               a shuffled order of 0 … n-1, n up to 10000
+GET /api/entropy?bytes=32                   1 to 1024 private bytes with a signed receipt
+GET /api/quantum?bytes=32                   1 to 64 raw device bytes, served once
+GET /api/stats                              counters, reservoir, sources, health tests
+GET /api/config                             node key, round length, limits, token</pre>
+    <p>All responses are JSON and allow cross-origin requests. <code>round</code> defaults to the latest round. Limits per address: 120 entropy requests a minute and 30 raw requests a minute. The node keeps the latest 3,000 rounds; older indexes return 410.</p>
+    <pre>curl "<span class="o"></span>/api/draw?round=1200&seed=my-raffle&min=1&max=500&count=3"
+curl "<span class="o"></span>/api/entropy?bytes=32"</pre>
+
+    <h3 id="verify">Verify it yourself</h3>
+    <p>Every page on this site that shows a result recomputes it with <code>voidlib.js</code> first. You can do the same from any JavaScript runtime:</p>
+    <pre>import { verifyRound, draw } from './voidlib.js';
+
+const base = '<span class="o"></span>';
+const { nodeKey } = await (await fetch(base + '/api/config')).json();
+const r    = await (await fetch(base + '/api/beacon/1200')).json();
+const prev = await (await fetch(base + '/api/beacon/1199')).json();
+
+verifyRound(r, nodeKey, prev).ok;          // output, signature, chain link, commitment
+draw(r.output, 'my-raffle', 1, 500, 3);    // the same numbers the node returns</pre>
+    <p>To check the outside inputs, look up the NIST pulse index at <code>beacon.nist.gov/beacon/2.0/chain/2/pulse/&lt;index&gt;</code> and the drand round at <code>api.drand.sh/public/&lt;round&gt;</code>, and compare the values with the ones printed in the round.</p>
+
+    <h3 id="token">Token</h3>
+    <p>$VOID is the token of the protocol. It funds the node, its sources and the roadmap: posting rounds on-chain so contracts can read them, adding a second quantum device that works on a different physical principle, and independent operators whose rounds are combined. <span id="tk"></span></p>
+  </div>
+</div></main>
+<script type="module">
+import { chrome, APP, $, config, short } from '/common.js';
+chrome(APP, ['/console', 'console ↗']);
+config().then((c) => { $('nk').textContent = short(c.nodeKey, 12); document.querySelectorAll('.o').forEach((e) => (e.textContent = location.origin)); $('tk').textContent = c.token.mint ? 'Contract address on ' + c.token.chain + ': ' + c.token.mint : 'It launches on ' + c.token.chain + '; the contract address will appear on the home page.'; });
+</script></body></html>

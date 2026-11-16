@@ -1,0 +1,89 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VOID Console · live quantum beacon</title>
+<meta name="description" content="Watch the VOID beacon produce rounds, re-check any round in your browser, inspect the quantum sources and call the entropy and draw APIs.">
+<link rel="icon" href="/favicon.svg"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Geist+Mono:wght@400&display=swap" rel="stylesheet"><link rel="stylesheet" href="/style.css">
+<style>
+.rnd{display:grid;grid-template-columns:86px 1fr auto auto;gap:14px;padding:12px 18px;border-bottom:1px solid var(--line);font:400 13px var(--mono);align-items:center;cursor:pointer}.rnd:hover{background:var(--graphite)}.rnd .i{color:var(--hi)}.rnd.new{animation:fl .9s ease-out}@keyframes fl{from{background:rgba(168,85,247,.22)}to{background:transparent}}
+.detail{padding:6px 18px 16px;border-bottom:1px solid var(--line);background:var(--void)}
+.chk{display:flex;gap:10px;align-items:baseline;font:400 12px var(--mono);padding:5px 0}.chk b{font-weight:400}
+.gauge{height:6px;background:var(--graphite);border-radius:3px;overflow:hidden;margin-top:10px}.gauge i{display:block;height:100%;background:linear-gradient(90deg,#6d28d9,#c084fc);width:0;transition:width .6s}
+.src{padding:14px 18px;border-bottom:1px solid var(--line)}.src:last-child{border-bottom:0}.src .t{display:flex;justify-content:space-between;gap:12px;align-items:center}.src b{font-weight:500;font-size:15px}.src p{color:var(--fog);font-size:12px;line-height:1.5;margin-top:6px}.src .m{font:400 11px var(--mono);color:var(--fog);margin-top:8px}
+.play{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-top:20px}.play .panel{padding-bottom:6px}.play .bd{padding:4px 18px 16px}.f3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.f2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.out{margin-top:14px;min-height:44px}.big{font:500 30px var(--display);font-stretch:112%;color:var(--head);word-break:break-word}
+#spark{width:100%;height:64px;display:block}
+@media(max-width:900px){.play{grid-template-columns:1fr}.rnd{grid-template-columns:70px 1fr auto}.rnd>:nth-child(3){display:none}.f3{grid-template-columns:1fr}}
+</style></head><body>
+<main class="app"><div class="wrap">
+  <div class="pagehead"><h1>Console</h1><div class="row"><span class="pill" id="pLive"><i></i>connecting</span><span class="pill">next round in <b id="cd" style="color:var(--ice);font-weight:400">…</b></span></div></div>
+  <div class="stats">
+    <div><span>beacon rounds</span><b id="sR">…</b></div><div><span>quantum bytes received</span><b id="sQ">…</b></div><div><span>reservoir</span><b id="sV">…</b><div class="gauge"><i id="sG"></i></div></div><div><span>entropy requests served</span><b id="sE">…</b></div>
+  </div>
+  <div class="grid2" style="margin-top:20px;align-items:start">
+    <div class="panel"><div class="hd"><span>beacon rounds · newest first</span><span>click a round to re-check it here</span></div><div id="rounds"></div></div>
+    <div>
+      <div class="panel"><div class="hd"><span>sources</span><span id="srcN"></span></div><div id="sources"></div></div>
+      <div class="panel" style="margin-top:20px"><div class="hd"><span>health of the quantum sample</span><span id="hP"></span></div><div style="padding:14px 18px"><canvas id="spark"></canvas><div id="health" style="margin-top:8px"></div></div></div>
+    </div>
+  </div>
+
+  <div class="pagehead" style="margin-top:70px"><h1 style="font-size:clamp(28px,4vw,48px)">Try the API</h1><a class="pbtn" href="/docs#api">full reference ↗</a></div>
+  <div class="play">
+    <div class="panel"><div class="hd"><span>provably fair draw</span><span>GET /api/draw</span></div><div class="bd">
+      <div class="f3"><div><label>min</label><input id="dMin" value="1"></div><div><label>max</label><input id="dMax" value="6"></div><div><label>count</label><input id="dCount" value="5"></div></div>
+      <div class="f2"><div><label>seed (your choice)</label><input id="dSeed" value="my-raffle-2026"></div><div><label>round</label><select id="dRound" style="width:100%"><option value="next">the next round (not produced yet)</option><option value="latest">the latest round</option></select></div></div>
+      <div class="row" style="margin-top:16px"><button class="btn solid" id="dGo">draw</button><span class="cap" id="dNote"></span></div><div class="out" id="dOut"></div></div></div>
+    <div class="panel"><div class="hd"><span>provably fair shuffle</span><span>GET /api/shuffle</span></div><div class="bd">
+      <div class="f2"><div><label>items</label><input id="hN" value="10"></div><div><label>seed (your choice)</label><input id="hSeed" value="mint-order"></div></div>
+      <div class="row" style="margin-top:16px"><button class="btn solid" id="hGo">shuffle on the latest round</button></div><div class="out" id="hOut"></div></div></div>
+    <div class="panel"><div class="hd"><span>entropy · bytes nobody else receives</span><span>GET /api/entropy</span></div><div class="bd">
+      <div class="f2"><div><label>bytes (1 to 1024)</label><input id="eN" value="32"></div><div><label>&nbsp;</label><button class="btn solid" id="eGo" style="width:100%;justify-content:center">request</button></div></div><div class="out" id="eOut"></div></div></div>
+    <div class="panel"><div class="hd"><span>raw quantum bytes · served once</span><span>GET /api/quantum</span></div><div class="bd">
+      <div class="f2"><div><label>bytes (1 to 64)</label><input id="qN" value="16"></div><div><label>&nbsp;</label><button class="btn solid" id="qGo" style="width:100%;justify-content:center">request</button></div></div><div class="out" id="qOut"></div></div></div>
+  </div>
+  <div class="note">Draws and shuffles are computed from a public beacon round and the seed you supply, so anyone can recompute them. This page recomputes every result itself with the published rules before showing a tick. Entropy and raw quantum bytes are private to the caller: each response is new and is never repeated.</div>
+</div></main>
+
+<script type="importmap">{"imports":{"@noble/hashes/":"/vendor/@noble/hashes/esm/","@noble/curves/":"/vendor/@noble/curves/esm/"}}</script>
+<script type="module">
+import { chrome, APP, $, api, short, num, ago, toast, copy } from '/common.js';
+import { verifyRound, draw, shuffle, verifyReceipt, unhex } from '/voidlib.js';
+chrome(APP, ['/forge', 'key forge ↗']);
+let KEY = '', ROUNDS = [], OPEN = -1, S = null;
+const tick = (ok) => (ok ? '<span class="ok">✓</span>' : '<span class="bad">✕</span>');
+function rowHtml(r) { return `<div class="rnd" data-i="${r.index}"><span class="i">#${num(r.index)}</span><span class="mono-trunc">${r.output}</span><span class="tag ${r.quantum.bytes ? 'q' : ''}">${r.quantum.bytes} quantum bytes</span><span class="dim">${new Date(r.time).toLocaleTimeString()}</span></div>` + (OPEN === r.index ? detail(r) : ''); }
+function detail(r) { const prev = ROUNDS.find((x) => x.index === r.index - 1), v = verifyRound(r, KEY, prev);
+  return `<div class="detail">${v.checks.map((c) => `<div class="chk">${tick(c.ok)}<b>${c.name}</b><span class="dim">${c.note}</span></div>`).join('')}${prev ? '' : '<div class="chk dim">the previous round is outside this list, so the chain link was not checked</div>'}
+    <div class="kv" style="margin-top:8px"><span>quantum bytes</span><span>${r.quantum.hex || 'none'}</span></div><div class="kv"><span>node value</span><span>${r.local}</span></div><div class="kv"><span>NIST pulse ${r.nist ? '#' + r.nist.pulse : ''}</span><span>${r.nist ? r.nist.value : 'not in this round'}</span></div><div class="kv"><span>drand round ${r.drand ? '#' + r.drand.round : ''}</span><span>${r.drand ? r.drand.randomness : 'not in this round'}</span></div><div class="kv"><span>commitment to next node value</span><span>${r.commitNext}</span></div><div class="kv"><span>output</span><span>${r.output}</span></div><div class="kv"><span>signature</span><span>${r.sig}</span></div></div>`; }
+function paint(fresh) { $('rounds').innerHTML = ROUNDS.slice(0, 14).map(rowHtml).join(''); if (fresh != null) { const el = $('rounds').querySelector(`[data-i="${fresh}"]`); if (el) el.classList.add('new'); }
+  $('rounds').querySelectorAll('.rnd').forEach((el) => (el.onclick = () => { OPEN = OPEN === +el.dataset.i ? -1 : +el.dataset.i; paint(); })); }
+function onRound(r) { if (ROUNDS.length && ROUNDS[0].index >= r.index) return; ROUNDS.unshift(r); ROUNDS = ROUNDS.slice(0, 60); paint(r.index); nextAt = r.time + (S ? S.roundSec : 10) * 1000; $('sR').textContent = num(r.index + 1); }
+let nextAt = 0; setInterval(() => { const s = Math.max(0, (nextAt - Date.now()) / 1000); $('cd').textContent = nextAt ? s.toFixed(1) + 's' : '…'; }, 100);
+// sparkline of the latest quantum bytes that went into beacon rounds
+function spark() { const c = $('spark'), w = c.width = c.offsetWidth * 2, h = c.height = 128, g = c.getContext('2d'); const bytes = ROUNDS.slice(0, 8).flatMap((r) => Array.from(unhex(r.quantum.hex))); if (!bytes.length) return; g.clearRect(0, 0, w, h); const bw = w / bytes.length;
+  bytes.forEach((b, i) => { g.fillStyle = b > 200 ? '#efeaf7' : '#a855f7'; g.globalAlpha = 0.35 + (b / 255) * 0.65; g.fillRect(i * bw, h - (b / 255) * h, Math.max(1, bw - 1), (b / 255) * h); }); }
+async function load() { try { S = await api('/api/stats'); KEY = S.nodeKey;
+  $('sR').textContent = num(S.round + 1); $('sQ').textContent = num(S.counters.quantumIn); $('sV').textContent = num(S.reservoir) + ' B'; $('sG').style.width = (S.reservoir / S.reservoirMax * 100).toFixed(1) + '%'; $('sE').textContent = num(S.counters.entropyReq + S.counters.rawReq);
+  const on = S.sources.filter((x) => x.enabled); $('srcN').textContent = on.filter((x) => x.ok).length + ' of ' + on.length + ' answering';
+  $('sources').innerHTML = S.sources.map((x) => `<div class="src"><div class="t"><b>${x.name}</b><span class="row" style="gap:8px"><span class="tag ${x.kind === 'quantum' ? 'q' : ''}">${x.kind === 'quantum' ? 'quantum device' : 'public beacon'}</span><span class="pill ${x.enabled && x.ok ? '' : 'bad'}"><i></i>${!x.enabled ? 'needs a key' : x.ok ? 'answering' : 'retrying'}</span></span></div><p>${x.device}. Operated by ${x.operator}.</p><div class="m">${x.enabled ? num(x.bytes) + ' bytes · ' + num(x.pulls) + ' pulls · last ' + (x.lastOk ? ago(x.lastOk) : 'never') + ' · every ' + x.every + 's' : 'set ' + (x.id === 'anu' ? 'ANU_KEY' : 'a key') + ' on the node to add this device'} · <a href="${x.url}" target="_blank" rel="noopener" style="color:var(--hi)">source ↗</a></div></div>`).join('');
+  const h = S.health; $('hP').innerHTML = h ? (h.pass ? '<span class="ok">all tests pass</span>' : '<span class="bad">a test is out of range</span>') : 'collecting';
+  $('health').innerHTML = h ? [['sample', num(h.bytes) + ' bytes, latest from the device'], ['share of 1 bits', (h.ones * 100).toFixed(3) + '% · z ' + h.monobitZ], ['runs test', 'z ' + h.runsZ], ['chi-square over byte values', h.chiSquare + ' (expect about 255) · z ' + h.chiZ], ['entropy', h.entropyBitsPerByte + ' bits per byte'], ['serial correlation', String(h.serialCorrelation)]].map(([k, v]) => `<div class="kv"><span>${k}</span><span>${v}</span></div>`).join('') : '';
+  spark(); } catch (e) {} }
+const fail = (el, r) => { el.innerHTML = `<span class="bad mono" style="font-size:12px">${r.error || 'request failed'}</span>`; };
+// draw: by default commits to the NEXT round, so the result cannot be known by anyone when you press the button
+$('dGo').onclick = async () => { const o = $('dOut'), min = +$('dMin').value, max = +$('dMax').value, count = +$('dCount').value, seed = $('dSeed').value; let round = ROUNDS[0] ? ROUNDS[0].index : 0;
+  if ($('dRound').value === 'next') { round += 1; o.innerHTML = `<span class="cap">committed to round #${num(round)} and seed “${seed}”. Waiting for the round to exist…</span>`; while (!ROUNDS.find((x) => x.index === round)) await new Promise((z) => setTimeout(z, 400)); }
+  const r = await api(`/api/draw?round=${round}&seed=${encodeURIComponent(seed)}&min=${min}&max=${max}&count=${count}`); if (r.error) return fail(o, r);
+  let mine = []; try { mine = draw(r.output, seed, min, max, count); } catch (e) {} const same = JSON.stringify(mine) === JSON.stringify(r.values);
+  o.innerHTML = `<div class="big">${r.values.join(' · ')}</div><div class="chk">${tick(same)}<b>recomputed in this page from round #${num(r.round)}</b><span class="dim">${same ? 'identical' : 'mismatch'}</span></div>`; };
+$('hGo').onclick = async () => { const o = $('hOut'), n = +$('hN').value, seed = $('hSeed').value, r = await api(`/api/shuffle?n=${n}&seed=${encodeURIComponent(seed)}`); if (r.error) return fail(o, r);
+  let mine = []; try { mine = shuffle(r.output, seed, n); } catch (e) {} const same = JSON.stringify(mine) === JSON.stringify(r.order);
+  o.innerHTML = `<div class="hexblock">${r.order.slice(0, 200).join(' ')}${r.order.length > 200 ? ' …' : ''}</div><div class="chk">${tick(same)}<b>recomputed in this page from round #${num(r.round)}</b><span class="dim">${same ? 'identical' : 'mismatch'}</span></div>`; };
+$('eGo').onclick = async () => { const o = $('eOut'), r = await api('/api/entropy?bytes=' + (+$('eN').value)); if (r.error) return fail(o, r); const v = verifyReceipt(r, r.nodeKey);
+  o.innerHTML = `<div class="hexblock" id="eHex" style="cursor:pointer" title="copy">${r.hex}</div>${v.checks.map((c) => `<div class="chk">${tick(c.ok)}<b>${c.name}</b></div>`).join('')}<div class="chk dim">${r.receipt.quantumBytes} fresh quantum bytes from ${r.quantumSource.join(' + ') || 'the pool'} went into this response · receipt ${short(r.receipt.id, 8)}</div>`; $('eHex').onclick = () => copy(r.hex, 'bytes'); load(); };
+$('qGo').onclick = async () => { const o = $('qOut'), r = await api('/api/quantum?bytes=' + (+$('qN').value)); if (r.error) return fail(o, r);
+  o.innerHTML = `<div class="hexblock" id="qHex" style="cursor:pointer" title="copy">${r.hex}</div><div class="chk dim">${r.bytes} bytes straight from ${r.device.join(' + ')}, now removed from the reservoir</div>`; $('qHex').onclick = () => copy(r.hex, 'bytes'); load(); };
+// boot: history first, then the live stream
+(async () => { await load(); const b = await api('/api/beacon?limit=30'); if (b.rounds) { ROUNDS = b.rounds; paint(); if (ROUNDS[0]) nextAt = ROUNDS[0].time + S.roundSec * 1000; spark(); }
+  try { const es = new EventSource('/api/stream'); es.onopen = () => { $('pLive').className = 'pill'; $('pLive').innerHTML = '<i></i>node live'; }; es.onerror = () => { $('pLive').className = 'pill bad'; $('pLive').innerHTML = '<i></i>reconnecting'; }; es.onmessage = (e) => { onRound(JSON.parse(e.data)); spark(); }; } catch (e) {}
+  setInterval(load, 8000); })();
+</script></body></html>

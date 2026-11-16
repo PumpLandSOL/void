@@ -1,0 +1,8 @@
+node_modules/
+data.json
+data.json.bak
+data.json.tmp
+.env
+*.log
+_studio/kit/
+_studio/frames-*/

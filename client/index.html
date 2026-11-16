@@ -1,0 +1,208 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VOID · real quantum entropy for Web3</title>
+<meta name="description" content="VOID ($VOID): a public randomness beacon, an entropy API and a key forge, seeded by a photonic quantum random number generator. Every round is signed, chained and re-checkable in your browser.">
+<meta property="og:title" content="VOID · real quantum entropy for Web3"><meta property="og:description" content="A public randomness beacon, an entropy API and a key forge, seeded by real quantum hardware."><meta property="og:image" content="{{SITE_URL}}/og.png"><meta name="twitter:card" content="summary_large_image"><meta property="og:url" content="{{SITE_URL}}/">
+<link rel="icon" href="/favicon.svg"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Geist+Mono:wght@400&display=swap" rel="stylesheet"><link rel="stylesheet" href="/style.css">
+<style>
+section{position:relative;padding:clamp(80px,10vw,140px) 0}
+.disp{font:500 clamp(36px,6.4vw,84px)/1 var(--display);font-stretch:118%;letter-spacing:-.025em;color:var(--head)}
+.spread{display:flex;justify-content:space-between;align-items:baseline;gap:20px;flex-wrap:wrap}.spread .disp{white-space:nowrap}
+.labels{display:flex;align-items:center;gap:14px;margin-bottom:18px}.labels span{font:400 10px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--fog);white-space:nowrap}.labels i{flex:1;height:1px;background:var(--line)}
+.lead{max-width:600px;margin:34px auto 0;text-align:center;color:var(--fog);font-size:15px;line-height:1.7}.lead b{color:var(--ice);font-weight:400}
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}.reveal.in{opacity:1;transform:none}
+/* hero */
+#top{height:100vh;min-height:620px;padding:0;position:sticky;top:0;z-index:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+#field{position:absolute;inset:0;width:100%;height:100%}
+.hero-h{position:relative;text-align:center;font:500 clamp(42px,7vw,96px)/.98 var(--display);font-stretch:118%;letter-spacing:-.03em;color:var(--head);padding:0 20px}
+.hero-h b{font-weight:500;color:var(--hi)}
+.seedcap{position:absolute;bottom:64px;left:0;right:0;text-align:center;font:400 10px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--fog)}.seedcap b{color:var(--ice);font-weight:400}
+.cue{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);width:22px;height:22px;border:1px solid var(--line2);border-radius:4px;display:flex;align-items:center;justify-content:center;font:10px var(--mono);color:var(--fog)}
+.over{position:relative;z-index:1;background:var(--void)}
+/* problem ledger */
+.ledger{margin-top:56px;padding:6px 26px}
+.inc{display:grid;grid-template-columns:110px 1.1fr 1.6fr auto;gap:22px;align-items:baseline;padding:18px 0;border-bottom:1px solid var(--line)}.inc:last-child{border-bottom:0}
+.inc .y{font:500 30px var(--display);font-stretch:112%;color:var(--head)}.inc b{font-weight:500;font-size:16px}.inc p{color:var(--fog);font-size:13px;line-height:1.6}.inc .c{font:400 12px var(--mono);color:var(--hi);white-space:nowrap}
+/* design cards */
+.mark{display:flex;gap:22px;align-items:flex-start}.mark h2{font:400 clamp(26px,3vw,38px)/1.2 var(--display);color:var(--fog);max-width:680px}.mark h2 b{color:var(--ice);font-weight:500}
+.cards{display:flex;gap:20px;overflow-x:auto;padding:46px 0 10px;scroll-snap-type:x mandatory;scrollbar-width:thin}
+.card{flex:0 0 300px;scroll-snap-align:start;padding:22px;min-height:300px;display:flex;flex-direction:column;justify-content:space-between;border-radius:4px;transition:border-color .3s,background .3s}.card:hover{border-color:var(--line2);background:var(--graphite)}
+.card h4{font:500 30px/1.05 var(--display);font-stretch:112%;margin-top:22px;color:var(--ice)}.card p{color:var(--fog);font-size:13px;line-height:1.6;margin-top:14px}.card .rep{font:400 11px var(--mono);color:var(--steel);border-top:1px solid var(--line);padding-top:12px;margin-top:18px}.card .rep b{color:var(--fog);font-weight:400}
+/* beacon sheet */
+.sheet{background:var(--carbon);border:1px solid var(--line);border-radius:24px;padding:clamp(28px,4vw,56px);margin:0 max(12px,1vw)}
+.gap-h{text-align:center}.pay{display:grid;grid-template-columns:440px 1fr;gap:60px;margin-top:60px;align-items:start}
+.onchain{position:sticky;top:110px;padding:22px}.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.chips span{font:400 11px var(--mono);border:1px solid var(--line2);border-radius:999px;padding:4px 10px;color:var(--fog)}
+.steps>div{padding:30px 0;border-bottom:1px solid var(--line)}.steps>div:first-child{padding-top:0}.steps h5{font:500 22px/1.25 var(--display);margin:10px 0}.steps p{color:var(--fog);font-size:14px;line-height:1.7;max-width:540px}
+/* compare */
+.cmp{display:grid;grid-template-columns:repeat(3,1fr);margin-top:56px}.cmp>div{padding:26px;border-right:1px solid var(--line)}.cmp>div:last-child{border-right:0}.cmp>div:first-child{background:var(--graphite)}
+.cmp h4{font:500 46px/1 var(--display);font-stretch:112%;margin:10px 0 8px}.cmp .k{border-top:1px solid var(--line);padding:12px 0}.cmp .k span{display:block;font:400 10px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--fog);margin-bottom:4px}.cmp .k b{font-weight:400;font-size:14px}
+.cmp>div:not(:first-child) h4{color:var(--steel)}
+/* live numbers */
+.sizes{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:56px}.sizes>div{padding:22px;border-radius:14px;border:1px solid var(--line);background:var(--carbon)}.sizes b{display:block;font:500 42px/1 var(--display);font-stretch:112%;margin:14px 0 12px}.sizes p{color:var(--fog);font-size:13px;line-height:1.6}
+/* roadmap */
+.tline{display:grid;grid-template-columns:repeat(5,1fr);gap:24px;margin-top:56px;position:relative;padding-top:30px}.tline:before{content:'';position:absolute;top:4px;left:0;right:0;height:1px;background:var(--line2)}
+.tline>div{position:relative}.tline>div:before{content:'';position:absolute;top:-30px;left:0;width:7px;height:7px;background:var(--hi)}.tline .ph{display:flex;justify-content:space-between;font:400 10px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--fog);margin-bottom:10px}.tline .ph b{color:var(--ice);font-weight:400}
+.tline p{font-size:13px;color:var(--fog);line-height:1.6}.tline p strong{color:var(--ice);font-weight:500}
+/* faq */
+.faq{margin-top:56px;border-top:1px solid var(--line)}.faq>div{display:grid;grid-template-columns:1fr 1.3fr;gap:40px;padding:26px 0;border-bottom:1px solid var(--line)}.faq h5{font:500 19px/1.35 var(--display)}.faq p{color:var(--fog);font-size:14px;line-height:1.7}.faq p b{color:var(--ice);font-weight:400}
+/* follow */
+.follow{min-height:720px;display:flex;align-items:center;overflow:hidden}#rays{position:absolute;inset:0;width:100%;height:100%}
+.follow .wrap{position:relative;display:grid;grid-template-columns:1fr 2fr 1fr;align-items:end;gap:20px;width:100%}
+.follow h2{font:500 clamp(40px,6vw,84px)/1 var(--display);font-stretch:118%;text-align:center;color:var(--ice);letter-spacing:-.02em}
+.follow .side a{display:inline-block;margin-right:16px;font-size:13px}.follow .side p{font:400 12px var(--mono);color:var(--fog);margin-top:6px}
+@media(max-width:900px){.inc{grid-template-columns:70px 1fr;gap:6px 16px}.inc p,.inc .c{grid-column:2}.pay{grid-template-columns:1fr}.onchain{position:relative;top:0}.cmp{grid-template-columns:1fr}.cmp>div{border-right:0;border-bottom:1px solid var(--line)}.sizes{grid-template-columns:1fr 1fr}.tline{grid-template-columns:1fr;padding-top:0}.tline:before,.tline>div:before{display:none}
+  .faq>div{grid-template-columns:1fr;gap:10px}.follow .wrap{grid-template-columns:1fr;text-align:center}.follow .side{text-align:center!important}.spread .disp{white-space:normal}.sheet{padding:26px 18px}}
+</style></head><body>
+<section id="top"><canvas id="field"></canvas><h1 class="hero-h">Randomness,<br><b>out of the void.</b></h1><div class="seedcap">this field is drawn from beacon round <b id="hR">…</b> · <b id="hQ">…</b> quantum bytes</div><a class="cue" href="#problem">↓</a></section>
+
+<div class="over">
+<section id="problem"><div class="wrap">
+  <div class="labels reveal"><span>where</span><i></i><span>your</span><i></i><span>keys</span><i></i><span>come from</span></div>
+  <div class="spread reveal"><span class="disp">Seeded.</span><span class="disp">Guessed.</span><span class="disp">Drained.</span></div>
+  <p class="lead reveal">Every wallet starts as a random number. Software cannot make one: a pseudo-random generator is a formula, and <b>whoever learns its starting state can replay every key it will ever produce.</b> That has already cost real money, more than once.</p>
+  <div class="frame ledger reveal">
+    <div class="inc"><span class="y">2013</span><b>Android SecureRandom</b><p>A flaw in the platform's random number generator let attackers recover the private keys of Bitcoin wallets made on Android.</p><span class="c">wallets emptied</span></div>
+    <div class="inc"><span class="y">2022</span><b>Profanity</b><p>A vanity-address tool seeded its keys from 32 bits. Addresses it made were brute-forced, including one that held Wintermute's funds.</p><span class="c">about $160M taken</span></div>
+    <div class="inc"><span class="y">2023</span><b>Milk Sad</b><p>A widely used command-line wallet tool seeded its generator from 32 bits of clock time. Every wallet it made could be recomputed.</p><span class="c">about $900K taken</span></div>
+  </div>
+  <p class="lead reveal">Quantum measurement is different in kind. The outcome of measuring a photon is not hidden in any earlier state, so there is nothing to learn and nothing to replay. <b>VOID takes those measurements and puts them where Web3 can use them.</b></p>
+</div></section>
+
+<section id="design"><div class="wrap">
+  <div class="labels reveal"><span>inside</span><i></i><span>the</span><i></i><span>void</span><i></i><span>node</span></div>
+  <div class="mark reveal"><span id="bigmark"></span><h2>From a photon in a lab to <b>a number you can check</b>, in seven parts:</h2></div>
+  <div class="cards">
+    <div class="card frame"><span class="cap">source</span><div><h4>Photonic QRNG</h4><p>Raw bytes come from an ID Quantique Quantis device, a quantum random number generator that measures single photons.</p></div><div class="rep">replaces <b>a seeded formula</b></div></div>
+    <div class="card frame"><span class="cap">supply</span><div><h4>The reservoir</h4><p>Quantum bytes wait in a reservoir. A byte leaves it once, into one beacon round or one API response, and is never served again.</p></div><div class="rep">replaces <b>a reused seed</b></div></div>
+    <div class="card frame"><span class="cap">mixing</span><div><h4>The pool</h4><p>Everything the node receives is hashed into 64 bytes of secret state with SHA3-512. A weak input can only add to it.</p></div><div class="rep">replaces <b>one point of failure</b></div></div>
+    <div class="card frame"><span class="cap">public</span><div><h4>The beacon</h4><p>Every 10 seconds the node publishes a round: its inputs, a 512-bit output, a signature and a link to the round before.</p></div><div class="rep">replaces <b>"trust our server"</b></div></div>
+    <div class="card frame"><span class="cap">honesty</span><div><h4>One round ahead</h4><p>The node commits to its own contribution a round early, then mixes in NIST and drand values it could not have known.</p></div><div class="rep">replaces <b>an operator who can retry</b></div></div>
+    <div class="card frame"><span class="cap">fairness</span><div><h4>Provable draws</h4><p>Dice, lotteries and shuffles are computed from a round and a seed you choose. Anyone can recompute the result.</p></div><div class="rep">replaces <b>"the house rolled it"</b></div></div>
+    <div class="card frame"><span class="cap">keys</span><div><h4>Key Forge</h4><p>Wallets are made in your browser from node entropy mixed with your device's own. The node never sees the result.</p></div><div class="rep">replaces <b>keys made on a server</b></div></div>
+  </div>
+</div></section>
+
+<section id="beacon"><div class="sheet">
+  <div class="labels reveal"><span>how</span><i></i><span>a</span><i></i><span>round</span><i></i><span>is made</span></div>
+  <h2 class="disp gap-h reveal">A round is a receipt.</h2>
+  <p class="lead reveal">A beacon round publishes everything that went into it, so the output is a calculation you can repeat. <b>The panel shows the latest round from the running node</b>, and the check runs in this page.</p>
+  <div class="pay">
+    <div class="frame onchain reveal"><div class="row" style="justify-content:space-between;margin-bottom:6px"><span class="cap">latest round</span><a class="pbtn" style="padding:5px 10px" href="/console" id="rlink">live</a></div><div id="oc"></div>
+      <div class="row" style="margin-top:16px;justify-content:space-between"><button class="pbtn" id="vbtn">verify in your browser</button><span class="cap" id="vres"></span></div>
+      <div class="cap" style="margin-top:22px">never published</div><div class="chips"><span>the pool</span><span>the node key</span><span>bytes served through the API</span></div></div>
+    <div class="steps">
+      <div class="reveal"><span class="cap">● 01 · measure</span><h5>A lab device measures photons</h5><p>The quantum source returns raw bytes over HTTPS. The node runs frequency, runs, chi-square and correlation tests on what arrives and shows the results in the console.</p></div>
+      <div class="reveal"><span class="cap">● 02 · commit</span><h5>The node commits to its next value</h5><p>Each round carries the hash of the value the node will contribute to the round after it. Once that hash is public, the node cannot swap the value for a luckier one.</p></div>
+      <div class="reveal"><span class="cap">● 03 · mix</span><h5>Four inputs go into one hash</h5><p>32 fresh quantum bytes, the committed node value, the latest NIST Randomness Beacon pulse and the latest drand round are hashed together with the previous output using SHA3-512.</p></div>
+      <div class="reveal"><span class="cap">● 04 · sign and chain</span><h5>The output is signed and linked</h5><p>The node signs the round with its ed25519 key, and each round names the output of the one before it, so history cannot be rewritten without breaking every later round.</p></div>
+      <div class="reveal"><span class="cap">● 05 · use</span><h5>Anyone can build on it</h5><p>Name a future round and a seed before it exists, then draw from it once it does. Neither you nor the node could have known the result, and everyone can recompute it.</p></div>
+    </div>
+  </div>
+</div></section>
+
+<section id="compare"><div class="wrap">
+  <div class="labels reveal"><span>three</span><i></i><span>ways</span><i></i><span>to get</span><i></i><span>a random number</span></div>
+  <div class="spread reveal"><span class="disp">Same request.</span><span class="disp">Different source.</span></div>
+  <p class="lead reveal">Most on-chain randomness is one of two things. Here is how each compares with a quantum-seeded public beacon on the question that matters: <b>could someone have known the number first?</b></p>
+  <div class="cmp frame reveal">
+    <div><span class="cap" id="cmpmark">void beacon</span><h4>Measured</h4><span class="cap">where the number comes from</span><div class="k" style="margin-top:18px"><span>source</span><b>Photon measurements, plus NIST and drand</b></div><div class="k"><span>who could know it first</span><b>Nobody: the node commits before the outside values exist</b></div><div class="k"><span>can you re-check it</span><b>Yes, every input is published</b></div><div class="k"><span>raw device bytes</span><b>Available, each served once</b></div></div>
+    <div><span class="cap">a seeded generator</span><h4>Computed</h4><span class="cap">where the number comes from</span><div class="k" style="margin-top:18px"><span>source</span><b>A formula and a starting value</b></div><div class="k"><span>who could know it first</span><b>Anyone who learns the starting value</b></div><div class="k"><span>can you re-check it</span><b>Only by trusting whoever ran it</b></div><div class="k"><span>raw device bytes</span><b>None</b></div></div>
+    <div><span class="cap">a block hash</span><h4>Chosen</h4><span class="cap">where the number comes from</span><div class="k" style="margin-top:18px"><span>source</span><b>The hash of a block someone produced</b></div><div class="k"><span>who could know it first</span><b>The block producer, who can also withhold it</b></div><div class="k"><span>can you re-check it</span><b>Yes, but not that it was unbiased</b></div><div class="k"><span>raw device bytes</span><b>None</b></div></div>
+  </div>
+</div></section>
+
+<section id="sizes"><div class="wrap">
+  <div class="labels reveal"><span>numbers</span><i></i><span>from</span><i></i><span>the</span><i></i><span>running node</span></div>
+  <div class="spread reveal"><span class="disp">Measured,</span><span class="disp">then counted.</span></div>
+  <p class="lead reveal">These figures come from the node serving this page and refresh as rounds are produced.</p>
+  <div class="sizes reveal">
+    <div><span class="cap">beacon rounds</span><b id="zR">…</b><p>Signed, chained rounds published, one every <span id="zS">10</span> seconds.</p></div>
+    <div><span class="cap">quantum bytes received</span><b id="zQ">…</b><p>Raw bytes pulled from the photonic source since this node started counting.</p></div>
+    <div><span class="cap">entropy per byte</span><b id="zH">…</b><p>Shannon estimate on the latest quantum sample. A perfect source scores close to 8.</p></div>
+    <div><span class="cap">bytes served twice</span><b>0</b><p>A quantum byte leaves the reservoir once. No response ever repeats another.</p></div>
+  </div>
+</div></section>
+
+<section id="roadmap"><div class="wrap">
+  <div class="labels reveal"><span>from</span><i></i><span>one node</span><i></i><span>to</span><i></i><span>a network</span></div>
+  <div class="spread reveal"><span class="disp">The</span><span class="disp">roadmap.</span></div>
+  <div class="tline reveal">
+    <div><div class="ph"><b>phase 1</b><span>live</span></div><p><strong>The node.</strong> Quantum-seeded pool, public beacon, entropy and draw APIs, raw quantum bytes, the console and the Key Forge.</p></div>
+    <div><div class="ph"><b>phase 2</b><span>now</span></div><p><strong>$VOID.</strong> The token launches and carries the protocol forward.</p></div>
+    <div><div class="ph"><b>phase 3</b><span>next</span></div><p><strong>On-chain feed.</strong> Beacon rounds posted to a contract, so smart contracts can read a round and check its signature themselves.</p></div>
+    <div><div class="ph"><b>phase 4</b><span>planned</span></div><p><strong>More sources, more nodes.</strong> A second quantum device on a different physical principle, and independent operators whose rounds are combined.</p></div>
+    <div><div class="ph"><b>phase 5</b><span>planned</span></div><p><strong>SDKs.</strong> Small client libraries for JavaScript, Python and Solidity that fetch, verify and draw in one call.</p></div>
+  </div>
+  <div class="row reveal" style="justify-content:center;margin-top:46px"><a class="pbtn" href="/docs">read the docs ↗</a><a class="pbtn" href="/console">open the console ↗</a><a class="pbtn" href="/forge">forge a wallet ↗</a></div>
+</div></section>
+
+<section id="faq"><div class="wrap">
+  <div class="labels reveal"><span>things</span><i></i><span>people</span><i></i><span>keep</span><i></i><span>asking</span></div>
+  <div class="spread reveal"><span class="disp">Questions.</span><span class="disp">Answers.</span></div>
+  <div class="faq">
+    <div class="reveal"><h5>Is the randomness really quantum?</h5><p>The raw bytes come from an ID Quantique Quantis quantum random number generator operated by the Laboratory for Digitalisation at OTH Regensburg, which serves them over a public API. The device measures single photons. <b>The console shows every pull from it, the byte counts and the statistical tests the node runs on what arrives.</b> Each beacon round states how many quantum bytes it contains and prints them.</p></div>
+    <div class="reveal"><h5>Why mix in NIST and drand if the source is already quantum?</h5><p>Because a good design does not depend on one party. A quantum source proves the bytes were unpredictable when measured; it does not prove the operator relayed them honestly. The node commits to its own value one round early, then mixes in the NIST Randomness Beacon and drand, which are public, signed and outside its control. <b>The output is unpredictable as long as any one input is.</b></p></div>
+    <div class="reveal"><h5>What can I build with it?</h5><p>Anything that needs a number nobody could know in advance: raffles and airdrop draws, game loot and matchmaking, validator or committee selection, shuffled mints, tie-breaks. Commit to a future round and a seed, wait for the round, call the draw endpoint, and publish the round number so anyone can recompute it. For secrets such as keys and nonces, use the entropy endpoint, which returns bytes no one else receives.</p></div>
+    <div class="reveal"><h5>Does the node see the keys the Key Forge makes?</h5><p>No. The Forge asks the node for 64 bytes, then hashes them together with 64 bytes from your own device before deriving anything. <b>The node knows only its half.</b> The recovery phrase, the Ethereum and Solana addresses and the post-quantum key pairs are computed in your browser and never sent anywhere. The node signs a receipt for the bytes it gave you, which you can check.</p></div>
+    <div class="reveal"><h5>What are the post-quantum keys for?</h5><p>The Forge also derives an ML-DSA-65 signing key pair and an ML-KEM-768 key pair, the lattice schemes NIST standardised as FIPS 204 and FIPS 203. Chains do not accept them for transactions yet. They are for applications that want quantum-resistant signatures or key exchange today, such as signed messages, encrypted backups and off-chain identity.</p></div>
+    <div class="reveal"><h5>What is $VOID?</h5><p>$VOID is the token of the protocol. It funds the node, the sources and the work on the roadmap: the on-chain feed, additional quantum devices and independent operators. The API is open to use while the network is one node.</p></div>
+  </div>
+</div></section>
+
+<section class="follow"><canvas id="rays"></canvas><div class="wrap">
+  <div class="side"><div class="cap" style="margin-bottom:8px">follow us</div><span id="flinks"></span></div>
+  <div style="text-align:center"><div class="cap" style="margin-bottom:14px">● node live · round <span id="fH">…</span></div><h2>Draw from the void</h2><div class="row" style="justify-content:center;margin-top:26px"><a class="pbtn" href="/console">open the console ↗</a><div class="ca" id="ca"></div></div></div>
+  <div class="side" style="text-align:right"><div class="cap" style="margin-bottom:8px">specification</div><p>Protocol rules, API and FAQ in the docs.</p></div>
+</div></section>
+</div>
+
+<script type="importmap">{"imports":{"@noble/hashes/":"/vendor/@noble/hashes/esm/","@noble/curves/":"/vendor/@noble/curves/esm/"}}</script>
+<script type="module">
+import { chrome, LANDING, MARK, caBar, config, $, api, short, num } from '/common.js';
+import { verifyRound } from '/voidlib.js';
+const nav = chrome(LANDING, ['/console', 'console ↗']); $('bigmark').innerHTML = MARK(54); $('cmpmark').innerHTML = MARK(12) + ' void beacon';
+config().then((c) => { caBar($('ca'), c.token); $('flinks').innerHTML = (c.ghUrl ? `<a href="${c.ghUrl}" target="_blank" rel="noopener">GitHub</a>` : '') + `<a href="${c.xUrl}" target="_blank" rel="noopener">X</a>`; });
+const io = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && e.target.classList.add('in')), { threshold: 0.12 }); document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+const secs = ['top', 'problem', 'design', 'beacon', 'compare', 'roadmap'];
+addEventListener('scroll', () => { const y = scrollY + innerHeight * 0.35; let cur = 'top'; for (const s of secs) if ($(s).offsetTop <= y) cur = s; nav.querySelectorAll('nav a').forEach((a) => a.classList.toggle('on', a.getAttribute('href') === '/#' + cur));
+  $('top').style.opacity = Math.max(0, 1 - scrollY / (innerHeight * 0.9)); }, { passive: true });
+
+// hero: a stipple field with an empty disc at its centre. The noise table is rebuilt from each beacon round's output,
+// so the pattern on screen is literally a picture of the latest round.
+const cv = $('field'), g = cv.getContext('2d'); let W, H, dpr = Math.min(2, devicePixelRatio || 1);
+const fit = () => { W = cv.offsetWidth; H = cv.offsetHeight; cv.width = W * dpr; cv.height = H * dpr; g.setTransform(dpr, 0, 0, dpr, 0, 0); }; fit(); addEventListener('resize', fit);
+const P = new Uint8Array(512); let PN = null, blend = 1;
+function seedTable(hexOut) { const b = hexOut.match(/../g).map((x) => parseInt(x, 16)); let s = 0; const next = () => { s = (s + 1) % b.length; let x = b[s] ^ (b[(s * 7 + 3) % b.length] << 8) ^ (b[(s * 13 + 5) % b.length] << 16); b[s] = (b[s] * 167 + 13 + (x >>> 3)) & 255; return x >>> 0; };
+  const T = new Uint8Array(512); for (let i = 0; i < 256; i++) T[i] = i; for (let i = 255; i > 0; i--) { const j = next() % (i + 1); [T[i], T[j]] = [T[j], T[i]]; } for (let i = 0; i < 256; i++) T[i + 256] = T[i]; return T; }
+for (let i = 0; i < 256; i++) P[i] = P[i + 256] = (i * 73 + 41) & 255;
+const fade = (t) => t * t * (3 - 2 * t), lerp = (a, b, t) => a + (b - a) * t, hv = (T, x, y) => T[T[x & 255] + (y & 255)] / 255;
+const noiseT = (T, x, y) => { const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi; return lerp(lerp(hv(T, xi, yi), hv(T, xi + 1, yi), fade(xf)), lerp(hv(T, xi, yi + 1), hv(T, xi + 1, yi + 1), fade(xf)), fade(yf)); };
+const noise = (x, y) => (PN && blend < 1 ? lerp(noiseT(P, x, y), noiseT(PN, x, y), blend) : noiseT(P, x, y));
+let t0 = performance.now(); const STEP = 5;
+(function draw(now) { const t = (now - t0) / 1000; g.clearRect(0, 0, W, H);
+  if (PN) { blend = Math.min(1, blend + 0.02); if (blend >= 1) { P.set(PN); PN = null; } }
+  if (scrollY < innerHeight) { const R = Math.min(W, H) * 0.36; for (let y = 0; y < H; y += STEP) for (let x = 0; x < W; x += STEP) {
+    const dx = x - W / 2, dy = y - H / 2, dist = Math.hypot(dx, dy * 1.12) / R;
+    if (dist < 0.9) continue;                                   // the void: nothing is drawn inside the disc
+    const n = noise(x / 240 + t * 0.04, y / 240 - t * 0.025) * 0.72 + noise(x / 66 - t * 0.06, y / 66) * 0.28, rim = Math.max(0, 1 - Math.abs(dist - 1.02) / 0.16);
+    const d = n - 0.57 + rim * 0.34, r = ((Math.sin(x * 12.9898 + y * 78.233) * 43758.5453) % 1 + 1) % 1;
+    if (d > 0 && r < Math.min(0.94, d * 9)) { g.globalAlpha = 0.5 + r * 0.5; g.fillStyle = rim > 0.5 && r > 0.82 ? '#efeaf7' : '#a855f7'; g.fillRect(x + (r - 0.5) * 4, y + (((r * 7) % 1) - 0.5) * 4, 1.8, 1.8); } } }
+  g.globalAlpha = 1; requestAnimationFrame(draw); })(t0);
+
+// live node data
+let LAST = null, PREV = null, KEY = '';
+function showRound(r) { PREV = LAST && LAST.index === r.index - 1 ? LAST : PREV; LAST = r; PN = seedTable(r.output); blend = 0;
+  $('hR').textContent = '#' + num(r.index); $('hQ').textContent = r.quantum.bytes; $('fH').textContent = num(r.index); $('rlink').textContent = 'round ' + num(r.index) + ' ↗';
+  $('oc').innerHTML = [['quantum bytes', r.quantum.bytes + ' · ' + (r.quantum.source.join(' + ') || 'none')], ['quantum hex', short(r.quantum.hex, 12)], ['node value', short(r.local, 8)], ['NIST pulse', r.nist ? '#' + num(r.nist.pulse) : 'not in this round'], ['drand round', r.drand ? '#' + num(r.drand.round) : 'not in this round'], ['previous output', short(r.prev, 8)], ['output', short(r.output, 12)], ['signature', short(r.sig, 8)]].map(([k, v]) => `<div class="kv"><span>${k}</span><span>${v}</span></div>`).join('');
+  $('vres').textContent = ''; }
+$('vbtn').onclick = async () => { if (!LAST) return; if (!KEY) KEY = (await config()).nodeKey; let prev = PREV; if (!prev && LAST.index > 0) { const p = await api('/api/beacon/' + (LAST.index - 1)); if (!p.error) prev = p; }
+  const v = verifyRound(LAST, KEY, prev); $('vres').innerHTML = v.ok ? `<span class="ok">✓ ${v.checks.length} of ${v.checks.length} checks pass</span>` : `<span class="bad">✕ ${v.checks.filter((c) => !c.ok).map((c) => c.name).join(', ')}</span>`; };
+try { const es = new EventSource('/api/stream'); es.onmessage = (e) => showRound(JSON.parse(e.data)); } catch (e) {}
+async function live() { try { const s = await api('/api/stats'); $('zR').textContent = num(s.round + 1); $('zS').textContent = s.roundSec; $('zQ').textContent = num(s.counters.quantumIn); $('zH').textContent = s.health ? s.health.entropyBitsPerByte.toFixed(2) : '…'; if (!LAST) { const r = await api('/api/beacon/latest'); if (!r.error) showRound(r); } } catch (e) {} }
+live(); setInterval(live, 10000);
+
+// footer rays
+const rc = $('rays'), rg = rc.getContext('2d'); const rays = Array.from({ length: 22 }, (_, i) => ({ a: (i / 22) * Math.PI * 2 + Math.random() * 0.2, r0: 0.28 + Math.random() * 0.12, len: 0.18 + Math.random() * 0.25 }));
+(function ray(now) { const w = rc.width = rc.offsetWidth, h = rc.height = rc.offsetHeight, cx = w / 2, cy = h / 2, R = Math.max(w, h), t = now / 9000; rg.strokeStyle = 'rgba(168,85,247,.6)'; rg.lineWidth = 1.4;
+  for (const r of rays) { const a = r.a + t * 0.15; rg.beginPath(); rg.moveTo(cx + Math.cos(a) * R * r.r0, cy + Math.sin(a) * R * r.r0 * 0.7); rg.lineTo(cx + Math.cos(a) * R * (r.r0 + r.len), cy + Math.sin(a) * R * (r.r0 + r.len) * 0.7); rg.stroke(); }
+  setTimeout(() => requestAnimationFrame(ray), 60); })(0);
+</script></body></html>
