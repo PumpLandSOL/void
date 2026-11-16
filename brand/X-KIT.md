@@ -7,17 +7,17 @@
 
 ## Display name
 ```
-VOID | $VOID
+VOID | QaaS | $VOID
 ```
 
-## Bio (141/160)
+## Bio (148/160)
 ```
-Quantum-as-a-Service for Web3. Real quantum entropy over an open API: a public beacon, private bytes, fair draws and a Key Forge. QaaS. $VOID
+Quantum-as-a-Service for Web3. One open API, six quantum services: beacon, entropy, raw quantum bytes, fair draws, simulator, Key Forge. QaaS. $VOID
 ```
 
 ## DexScreener description
 ```
-VOID is Quantum-as-a-Service (QaaS) for Web3: real quantum entropy over an open API. Its node pulls raw random bytes from a photonic quantum random number generator, mixes them with the NIST Randomness Beacon and drand, and publishes a signed, hash-chained beacon round every 10 seconds with every input printed, so anyone can recompute it. An open API serves private entropy with signed receipts, raw quantum bytes that are each delivered once, and provably fair draws and shuffles. A circuit simulator runs quantum circuits exactly and samples their measurements with quantum entropy. The Key Forge builds a wallet in the browser from node entropy mixed with the device's own: a 24-word phrase, Ethereum and Solana addresses, and ML-DSA-65 and ML-KEM-768 post-quantum key pairs. The node never sees the keys.
+VOID is Quantum-as-a-Service (QaaS) for Web3: real quantum hardware behind one open API. Its node pulls raw random bytes from a photonic quantum random number generator, mixes them with the NIST Randomness Beacon and drand, and publishes a signed, hash-chained beacon round every 10 seconds with every input printed, so anyone can recompute it. The same API serves private entropy with signed receipts, raw quantum bytes that are each delivered once, and provably fair draws and shuffles. A circuit simulator runs quantum circuits exactly and samples their measurements with quantum entropy. The Key Forge builds a wallet in the browser from node entropy mixed with the device's own: a 24-word phrase, Ethereum and Solana addresses, and ML-DSA-65 and ML-KEM-768 post-quantum key pairs. The node never sees the keys. No key and no account are needed to use any of it.
 ```
 
 ## Website
@@ -32,57 +32,59 @@ https://voidqaas.xyz
 
 ## Tweets (all ≤245)
 
-### 1. Pinned · hype (video) · 244 chars · media: `void-hype-14s.mp4`
+### 1. Pinned · QaaS (video) · 211 chars · media: `void-hype-14s.mp4`
 ```
-Every wallet you own started as one random number.
+AWS turned servers into a service. Stripe did it for payments.
 
-Most apps get it from a formula. VOID gets it from a photon and serves it over an API.
+VOID does it for quantum.
 
-That's Quantum-as-a-Service. Randomness networks are worth billions, and this is the quantum one.
+Quantum-as-a-Service: real quantum hardware behind one open API, live for Web3 today. No lab, no key, no account.
 
 $VOID
 ```
 
-### 2. Key art · 244 chars · media: `void-g01-keyart.png`
+### 2. Key art · 194 chars · media: `void-g01-keyart.png`
 ```
-Chainlink is worth $6.98B. Pyth is worth $424M. Both sell randomness to Web3, and both make it with math.
+Web3 has compute as a service, storage as a service and data as a service.
 
-VOID makes it with physics. Quantum-as-a-Service: real quantum hardware behind an open API, with a public beacon anyone can check.
+It did not have quantum as a service. Now it does.
+
+VOID is QaaS: six quantum services, one API, running today.
 
 $VOID
 ```
 
-### 3. QaaS · 245 chars · media: `void-g13-qaas.png`
+### 3. What is in QaaS · 222 chars · media: `void-g13-qaas.png`
 ```
-Quantum-as-a-Service in one line: the hardware is our problem and the result is your HTTP call.
+What's inside Quantum-as-a-Service?
 
-Six services, one API: beacon, entropy, raw quantum bytes, fair draws, a simulator and a Key Forge. No key. No account.
+A public beacon. Private entropy. Raw quantum bytes. Provably fair draws. A circuit simulator. A Key Forge.
+
+Six services, one API, zero setup. That's VOID.
 
 https://voidqaas.xyz
 
 $VOID
 ```
 
-### 4. Simulator · 232 chars · media: `void-g14-sim.png`
+### 4. Simulator · 200 chars · media: `void-g14-sim.png`
 ```
-VOID runs quantum circuits.
+QaaS isn't only randomness. VOID runs quantum circuits too.
 
-Build one in your browser: Bell pairs, Grover search, the Fourier transform behind Shor's algorithm. When you measure, real photons pick the outcome.
-
-QaaS, compute included.
+Build one in your browser, from a Bell pair to Grover search. When you measure, real photons pick the outcome.
 
 https://voidqaas.xyz
 
 $VOID
 ```
 
-### 5. The problem · 228 chars · media: `void-g02-problem.png`
+### 5. The problem · 230 chars · media: `void-g02-problem.png`
 ```
 Weak randomness has already cost crypto real money.
 
 One tool seeded keys from 32 bits and about $160M walked out. Another used the clock and lost about $900K.
 
-VOID seeds keys from quantum measurements. Nothing to guess.
+The fix is a number nobody can guess. That's what VOID serves.
 
 $VOID
 ```
@@ -98,20 +100,20 @@ The fix isn't a better formula. It's no formula at all.
 $VOID
 ```
 
-### 7. The source · 220 chars · media: `void-g03-source.png`
+### 7. The source · 230 chars · media: `void-g03-source.png`
 ```
-The bytes behind VOID come out of a real machine: an ID Quantique photonic generator in a university lab, measuring single photons.
+Quantum-as-a-Service means the hardware is our problem.
 
-The node pulls 1,024 of them every 20 seconds and shows you the tests they pass.
+Behind VOID sits a real photonic quantum generator measuring single photons. The node pulls 1,024 bytes every 20 seconds and tests every batch. You just call the API.
 
 $VOID
 ```
 
-### 8. The round (video) · 213 chars · media: `void-round-14s.mp4`
+### 8. The round (video) · 227 chars · media: `void-round-14s.mp4`
 ```
-Every 10 seconds VOID publishes a round: 32 quantum bytes, a NIST pulse, a drand round, one hash, one signature.
+The first QaaS product is a beacon.
 
-Every input is printed, so you can recompute the whole thing yourself.
+Every 10 seconds VOID publishes a round: 32 quantum bytes, a NIST pulse, a drand round, one hash, one signature. Every input is printed, so you can recompute it.
 
 https://voidqaas.xyz
 
@@ -127,22 +129,22 @@ VOID shows its working. Each round prints what went in, is signed by the node an
 $VOID
 ```
 
-### 10. Fair draws · 237 chars · media: `void-g05-draw.png`
+### 10. Fair draws · 224 chars · media: `void-g05-draw.png`
 ```
-Running a raffle, a mint or an airdrop? Name a VOID round before it exists, pick a seed, then draw.
+QaaS for anyone running a raffle, a mint or an airdrop:
 
-Nobody could have known the result, including us, and anyone can recompute it. That's what fair looks like.
+Name a VOID round before it exists, pick a seed, then draw. Nobody could have known the result, including us, and anyone can recompute it.
 
 https://voidqaas.xyz
 
 $VOID
 ```
 
-### 11. Key Forge (video) · 230 chars · media: `void-forge-13s.mp4`
+### 11. Key Forge (video) · 220 chars · media: `void-forge-13s.mp4`
 ```
-The VOID Key Forge builds a wallet from quantum entropy mixed with your own device's.
+Quantum-as-a-Service, for your keys.
 
-24 words, an Ethereum address, a Solana address and two post-quantum key pairs, all made in your browser. The node never sees any of it.
+The VOID Key Forge builds a wallet from quantum entropy mixed with your own device's: 24 words, Ethereum, Solana and two post-quantum key pairs. The node never sees any of it.
 
 $VOID
 ```
@@ -169,31 +171,31 @@ $VOID
 
 ### 14. Market cap (video) · 191 chars · media: `void-mcap-13s.mp4`
 ```
-The market already prices randomness.
+The market already pays for services like this.
 
 Chainlink: $6.98B. Pyth: $424M. API3: $30.9M. Band: $26.9M.
 
-VOID is on that chart at day one, with a live quantum beacon you can open right now.
+VOID is the Quantum-as-a-Service entry on that chart, and it's at day one.
 
 $VOID
 ```
 
-### 15. Market cap · 219 chars · media: `void-g08-mcap.png`
+### 15. Market cap · 208 chars · media: `void-g08-mcap.png`
 ```
-Randomness is infrastructure, and infrastructure gets valued.
+Selling randomness as a service built a $6.98B network in Web3.
 
-The networks that sell it range from $26.9M to $6.98B in market cap today. VOID starts at the bottom of that ladder with the product already running.
+Quantum-as-a-Service is the next category over: the same demand, with real quantum hardware behind the API. VOID is already shipping it.
 
 $VOID
 ```
 
-### 16. The quantum names · 203 chars · media: `void-g09-quantum.png`
+### 16. The quantum names · 192 chars · media: `void-g09-quantum.png`
 ```
-What does the market pay for the word quantum?
-
 QRL: $73.8M. Qubic: $49.0M. QANplatform: $13.5M.
 
-VOID isn't selling the word. It serves real quantum bytes over an open API today, at day-one size.
+That's what the market pays for a quantum narrative.
+
+VOID is the QaaS one: real quantum bytes over an open API today, at day-one size.
 
 $VOID
 ```
@@ -209,22 +211,22 @@ https://voidqaas.xyz
 $VOID
 ```
 
-### 18. Roadmap · 234 chars · media: `void-g11-roadmap.png`
+### 18. Roadmap · 221 chars · media: `void-g11-roadmap.png`
 ```
-Where VOID goes from here.
+The QaaS roadmap.
 
-The node, the beacon, the simulator and the Key Forge are live. Next: rounds posted on Solana for programs to read, a second quantum device and independent operators.
+Live now: beacon, entropy, raw bytes, draws, simulator, Key Forge. Next: rounds on Solana for programs to read, a second quantum device and independent operators.
 
 One node today. A network next.
 
 $VOID
 ```
 
-### 19. Launch (fill CA) · 236 chars · media: `void-g12-live.png`
+### 19. Launch (fill CA) · 216 chars · media: `void-g12-live.png`
 ```
 $VOID is live on Solana.
 
-Quantum-as-a-Service: a beacon round every 10 seconds, an open entropy API, wallets forged in your browser.
+Quantum-as-a-Service for Web3: six quantum services behind one open API, running today.
 
 Chainlink sells randomness at a $6.98B market cap. This is day one.
 
