@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>VOID Docs · beacon, entropy API, Key Forge</title>
+<title>VOID Docs · Quantum-as-a-Service: beacon, entropy API, Key Forge</title>
 <meta name="description" content="How the VOID node sources quantum bytes, builds beacon rounds, serves entropy and provably fair draws, and how to verify every part yourself.">
 <link rel="icon" href="/favicon.svg"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Geist+Mono:wght@400&display=swap" rel="stylesheet"><link rel="stylesheet" href="/style.css">
 <style>.toc{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}.toc a{font:400 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--fog);border:1px solid var(--line2);border-radius:999px;padding:6px 12px}.toc a:hover{color:var(--ice);border-color:var(--hi)}
@@ -9,7 +9,7 @@
   <div class="toc"><a href="#overview">overview</a><a href="#sources">sources</a><a href="#pool">pool and reservoir</a><a href="#beacon">beacon</a><a href="#draws">draws</a><a href="#entropy">entropy</a><a href="#forge">key forge</a><a href="#api">api</a><a href="#verify">verify it yourself</a><a href="#token">token</a></div>
   <div class="prose">
     <h3 id="overview">Overview</h3>
-    <p>VOID is a node that turns quantum measurements into randomness Web3 can use and check. It does four things: it publishes a <b>public beacon</b> every 10 seconds, it serves <b>private entropy</b> on request, it computes <b>provably fair draws</b> from beacon rounds, and it supplies the node half of the <b>Key Forge</b>, which makes wallets in your browser.</p>
+    <p>VOID is Quantum-as-a-Service (QaaS): a node that sits in front of quantum hardware and turns its measurements into randomness Web3 can use and check, over plain HTTP. It does four things: it publishes a <b>public beacon</b> every 10 seconds, it serves <b>private entropy</b> on request, it computes <b>provably fair draws</b> from beacon rounds, and it supplies the node half of the <b>Key Forge</b>, which makes wallets in your browser.</p>
     <p>One file, <code>client/voidlib.js</code>, holds every rule a third party needs to re-check the node's work. The node imports the same file, so the published rules and the running code cannot drift apart.</p>
 
     <h3 id="sources">Sources</h3>

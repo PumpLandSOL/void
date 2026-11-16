@@ -1,7 +1,7 @@
 {
   "name": "void-protocol",
   "version": "0.1.0",
-  "description": "VOID ($VOID): real quantum entropy for Web3. A public randomness beacon, an entropy API and a key forge, seeded by a photonic quantum random number generator.",
+  "description": "VOID ($VOID): Quantum-as-a-Service for Web3. Real quantum entropy over an open API: a public beacon, private bytes, fair draws and a key forge.",
   "type": "module",
   "main": "server/index.js",
   "scripts": { "start": "node server/index.js", "test": "node test/run.js" },

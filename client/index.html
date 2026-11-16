@@ -1,7 +1,7 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>VOID · real quantum entropy for Web3</title>
-<meta name="description" content="VOID ($VOID): a public randomness beacon, an entropy API and a key forge, seeded by a photonic quantum random number generator. Every round is signed, chained and re-checkable in your browser.">
-<meta property="og:title" content="VOID · real quantum entropy for Web3"><meta property="og:description" content="A public randomness beacon, an entropy API and a key forge, seeded by real quantum hardware."><meta property="og:image" content="{{SITE_URL}}/og.png"><meta name="twitter:card" content="summary_large_image"><meta property="og:url" content="{{SITE_URL}}/">
+<title>VOID · Quantum-as-a-Service for Web3</title>
+<meta name="description" content="VOID ($VOID) is Quantum-as-a-Service (QaaS) for Web3: real quantum entropy over an open API. A public beacon, private bytes, raw device output, provably fair draws and a key forge, seeded by a photonic quantum random number generator.">
+<meta property="og:title" content="VOID · Quantum-as-a-Service for Web3"><meta property="og:description" content="Real quantum entropy over an open API: a public beacon, private bytes, fair draws and a key forge."><meta property="og:image" content="{{SITE_URL}}/og.png"><meta name="twitter:card" content="summary_large_image"><meta property="og:url" content="{{SITE_URL}}/">
 <link rel="icon" href="/favicon.svg"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Geist+Mono:wght@400&display=swap" rel="stylesheet"><link rel="stylesheet" href="/style.css">
 <style>
 section{position:relative;padding:clamp(80px,10vw,140px) 0}
@@ -15,6 +15,8 @@ section{position:relative;padding:clamp(80px,10vw,140px) 0}
 #field{position:absolute;inset:0;width:100%;height:100%}
 .hero-h{position:relative;text-align:center;font:500 clamp(42px,7vw,96px)/.98 var(--display);font-stretch:118%;letter-spacing:-.03em;color:var(--head);padding:0 20px}
 .hero-h b{font-weight:500;color:var(--hi)}
+.eyebrow{position:relative;display:block;text-align:center;font:400 12px var(--mono);letter-spacing:.34em;text-transform:uppercase;color:var(--ice);margin-bottom:26px}.eyebrow b{color:var(--hi);font-weight:400}
+.svc{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:56px}.svc a{display:flex;flex-direction:column;justify-content:space-between;min-height:230px;padding:20px;border:1px solid var(--line);background:var(--carbon);border-radius:14px;transition:border-color .3s,background .3s}.svc a:hover{border-color:var(--hi);background:var(--graphite)}.svc b{display:block;font:500 25px/1.1 var(--display);font-stretch:112%;margin:14px 0 10px;color:var(--ice)}.svc p{color:var(--fog);font-size:13px;line-height:1.55}.svc code{font:400 11px var(--mono);color:var(--hi);margin-top:16px;display:block}
 .seedcap{position:absolute;bottom:64px;left:0;right:0;text-align:center;font:400 10px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--fog)}.seedcap b{color:var(--ice);font-weight:400}
 .cue{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);width:22px;height:22px;border:1px solid var(--line2);border-radius:4px;display:flex;align-items:center;justify-content:center;font:10px var(--mono);color:var(--fog)}
 .over{position:relative;z-index:1;background:var(--void)}
@@ -49,10 +51,10 @@ section{position:relative;padding:clamp(80px,10vw,140px) 0}
 .follow .wrap{position:relative;display:grid;grid-template-columns:1fr 2fr 1fr;align-items:end;gap:20px;width:100%}
 .follow h2{font:500 clamp(40px,6vw,84px)/1 var(--display);font-stretch:118%;text-align:center;color:var(--ice);letter-spacing:-.02em}
 .follow .side a{display:inline-block;margin-right:16px;font-size:13px}.follow .side p{font:400 12px var(--mono);color:var(--fog);margin-top:6px}
-@media(max-width:900px){.inc{grid-template-columns:70px 1fr;gap:6px 16px}.inc p,.inc .c{grid-column:2}.pay{grid-template-columns:1fr}.onchain{position:relative;top:0}.cmp{grid-template-columns:1fr}.cmp>div{border-right:0;border-bottom:1px solid var(--line)}.sizes{grid-template-columns:1fr 1fr}.tline{grid-template-columns:1fr;padding-top:0}.tline:before,.tline>div:before{display:none}
+@media(max-width:900px){.svc{grid-template-columns:1fr 1fr}.svc a{min-height:0}.inc{grid-template-columns:70px 1fr;gap:6px 16px}.inc p,.inc .c{grid-column:2}.pay{grid-template-columns:1fr}.onchain{position:relative;top:0}.cmp{grid-template-columns:1fr}.cmp>div{border-right:0;border-bottom:1px solid var(--line)}.sizes{grid-template-columns:1fr 1fr}.tline{grid-template-columns:1fr;padding-top:0}.tline:before,.tline>div:before{display:none}
   .faq>div{grid-template-columns:1fr;gap:10px}.follow .wrap{grid-template-columns:1fr;text-align:center}.follow .side{text-align:center!important}.spread .disp{white-space:normal}.sheet{padding:26px 18px}}
 </style></head><body>
-<section id="top"><canvas id="field"></canvas><h1 class="hero-h">Randomness,<br><b>out of the void.</b></h1><div class="seedcap">this field is drawn from beacon round <b id="hR">…</b> · <b id="hQ">…</b> quantum bytes</div><a class="cue" href="#problem">↓</a></section>
+<section id="top"><canvas id="field"></canvas><div style="position:relative"><span class="eyebrow">Quantum-as-a-Service · <b>QaaS</b></span><h1 class="hero-h">Randomness,<br><b>out of the void.</b></h1></div><div class="seedcap">this field is drawn from beacon round <b id="hR">…</b> · <b id="hQ">…</b> quantum bytes</div><a class="cue" href="#problem">↓</a></section>
 
 <div class="over">
 <section id="problem"><div class="wrap">
@@ -65,6 +67,19 @@ section{position:relative;padding:clamp(80px,10vw,140px) 0}
     <div class="inc"><span class="y">2023</span><b>Milk Sad</b><p>A widely used command-line wallet tool seeded its generator from 32 bits of clock time. Every wallet it made could be recomputed.</p><span class="c">about $900K taken</span></div>
   </div>
   <p class="lead reveal">Quantum measurement is different in kind. The outcome of measuring a photon is not hidden in any earlier state, so there is nothing to learn and nothing to replay. <b>VOID takes those measurements and puts them where Web3 can use them.</b></p>
+</div></section>
+
+<section id="qaas"><div class="wrap">
+  <div class="labels reveal"><span>quantum</span><i></i><span>as</span><i></i><span>a</span><i></i><span>service</span></div>
+  <div class="spread reveal"><span class="disp">One API.</span><span class="disp">Five quantum services.</span></div>
+  <p class="lead reveal">You should not need a physics lab to use quantum randomness. <b>VOID is Quantum-as-a-Service: the hardware sits behind the node, and you call it over HTTP.</b> No key, no account, no SDK required.</p>
+  <div class="svc reveal">
+    <a href="/console"><div><span class="cap">01 · public</span><b>Beacon</b><p>A signed, chained round every 10 seconds that anyone can recompute.</p></div><code>GET /api/beacon/latest</code></a>
+    <a href="/console"><div><span class="cap">02 · private</span><b>Entropy</b><p>Up to 1,024 bytes nobody else receives, with a signed receipt.</p></div><code>GET /api/entropy</code></a>
+    <a href="/console"><div><span class="cap">03 · raw</span><b>Quantum bytes</b><p>Device output with no processing. Each byte is served once.</p></div><code>GET /api/quantum</code></a>
+    <a href="/console"><div><span class="cap">04 · fair</span><b>Draws</b><p>Numbers and shuffles from a round and a seed you choose.</p></div><code>GET /api/draw</code></a>
+    <a href="/forge"><div><span class="cap">05 · keys</span><b>Key Forge</b><p>Wallets and post-quantum keys made in your browser.</p></div><code>/forge</code></a>
+  </div>
 </div></section>
 
 <section id="design"><div class="wrap">
@@ -139,6 +154,7 @@ section{position:relative;padding:clamp(80px,10vw,140px) 0}
   <div class="labels reveal"><span>things</span><i></i><span>people</span><i></i><span>keep</span><i></i><span>asking</span></div>
   <div class="spread reveal"><span class="disp">Questions.</span><span class="disp">Answers.</span></div>
   <div class="faq">
+    <div class="reveal"><h5>What does Quantum-as-a-Service mean here?</h5><p>It means the quantum hardware is somebody else's problem and the result is an HTTP call. The node holds the connection to the device, tests what comes out of it, and exposes five services: a public beacon, private entropy, raw quantum bytes, provably fair draws and the Key Forge. <b>Any app, on any chain or none, can call it today</b> without a key or an account, and every response says how many fresh quantum bytes went into it.</p></div>
     <div class="reveal"><h5>Is the randomness really quantum?</h5><p>The raw bytes come from an ID Quantique Quantis quantum random number generator operated by the Laboratory for Digitalisation at OTH Regensburg, which serves them over a public API. The device measures single photons. <b>The console shows every pull from it, the byte counts and the statistical tests the node runs on what arrives.</b> Each beacon round states how many quantum bytes it contains and prints them.</p></div>
     <div class="reveal"><h5>Why mix in NIST and drand if the source is already quantum?</h5><p>Because a good design does not depend on one party. A quantum source proves the bytes were unpredictable when measured; it does not prove the operator relayed them honestly. The node commits to its own value one round early, then mixes in the NIST Randomness Beacon and drand, which are public, signed and outside its control. <b>The output is unpredictable as long as any one input is.</b></p></div>
     <div class="reveal"><h5>What can I build with it?</h5><p>Anything that needs a number nobody could know in advance: raffles and airdrop draws, game loot and matchmaking, validator or committee selection, shuffled mints, tie-breaks. Commit to a future round and a seed, wait for the round, call the draw endpoint, and publish the round number so anyone can recompute it. For secrets such as keys and nonces, use the entropy endpoint, which returns bytes no one else receives.</p></div>
@@ -162,7 +178,7 @@ import { verifyRound } from '/voidlib.js';
 const nav = chrome(LANDING, ['/console', 'console ↗']); $('bigmark').innerHTML = MARK(54); $('cmpmark').innerHTML = MARK(12) + ' void beacon';
 config().then((c) => { caBar($('ca'), c.token); $('flinks').innerHTML = (c.ghUrl ? `<a href="${c.ghUrl}" target="_blank" rel="noopener">GitHub</a>` : '') + `<a href="${c.xUrl}" target="_blank" rel="noopener">X</a>`; });
 const io = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && e.target.classList.add('in')), { threshold: 0.12 }); document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
-const secs = ['top', 'problem', 'design', 'beacon', 'compare', 'roadmap'];
+const secs = ['top', 'problem', 'qaas', 'design', 'beacon', 'compare', 'roadmap'];
 addEventListener('scroll', () => { const y = scrollY + innerHeight * 0.35; let cur = 'top'; for (const s of secs) if ($(s).offsetTop <= y) cur = s; nav.querySelectorAll('nav a').forEach((a) => a.classList.toggle('on', a.getAttribute('href') === '/#' + cur));
   $('top').style.opacity = Math.max(0, 1 - scrollY / (innerHeight * 0.9)); }, { passive: true });
 

@@ -2,7 +2,7 @@
 'use strict';
 // set these when the handle and the domain exist; every graphic footer, video end card and the X kit pick them up
 const X = '', SITE = '', TICK = '$VOID';
-const LINE = [SITE, X].filter(Boolean).join(' · ') || 'real quantum entropy for web3';
+const LINE = [SITE, X].filter(Boolean).join(' · ') || 'quantum-as-a-service · qaas';
 const FONTS = `<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Geist+Mono:wght@400&display=swap" rel="stylesheet">`;
 const MARK = (s = 40) => { let o = ''; for (let i = 0; i < 12; i++) { const a = (i / 12) * Math.PI * 2 - Math.PI / 2, r = i % 3 === 0 ? 1.5 : 1.1; o += `<rect x="${(12 + Math.cos(a) * 8.6 - r).toFixed(2)}" y="${(12 + Math.sin(a) * 8.6 - r).toFixed(2)}" width="${r * 2}" height="${r * 2}" fill="${i === 2 ? '#ffffff' : '#a855f7'}"/>`; } return `<svg width="${s}" height="${s}" viewBox="0 0 24 24">${o}</svg>`; };
 const CSS = (W, H) => `*{margin:0;padding:0;box-sizing:border-box}

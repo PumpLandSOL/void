@@ -1,6 +1,6 @@
 # VOID
 
-Real quantum entropy for Web3. One Node.js process that pulls raw bytes from a photonic quantum random number generator and turns them into things you can use and check:
+Quantum-as-a-Service (QaaS) for Web3: real quantum entropy over an open API. One Node.js process that pulls raw bytes from a photonic quantum random number generator and turns them into things you can use and check:
 
 - **Public beacon.** A signed, hash-chained round every 10 seconds. Each round prints its own inputs (32 quantum bytes, the node's committed value, the latest NIST Randomness Beacon pulse and drand round), so anyone can recompute the output.
 - **Entropy API.** Private random bytes with a signed receipt. Fresh quantum bytes go into every response.

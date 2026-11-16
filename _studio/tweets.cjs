@@ -1,4 +1,5 @@
 // writes brand/X-KIT.md and checks every tweet is ≤245 characters.  node _studio/tweets.cjs
+// Lead line everywhere: Quantum-as-a-Service (QaaS). User, 2026-11-16: "that is literally the main selling point".
 // Voice: bullish and direct. Randomness is priced infrastructure; VOID is the quantum entry at day one.
 // Comparisons use MARKET CAPS only (CoinGecko, 16 Nov 2026): Chainlink $6.98B, Pyth $424M, API3 $30.9M, Band $26.9M,
 // QRL $73.8M, Qubic $49.0M, QANplatform $13.5M. Loss figures: Profanity about $160M (2022), Milk Sad about $900K (2023).
@@ -7,20 +8,25 @@ const fs = require('fs'), path = require('path'), len = (s) => [...s].length;
 const L = require('./lib.cjs');
 // set X and SITE in lib.cjs once the handle and the domain exist: tweets in LINK then carry the site link
 const SITE = L.SITE ? 'https://' + L.SITE.replace(/^https?:\/\//, '') : '', HANDLE = L.X || '(handle not set yet)', NAME = 'VOID | $VOID';
-const LINK = new Set(['Key art', 'The round (video)', 'Fair draws', 'Key Forge (video)', 'Entropy API', 'Launch (fill CA)']);
-const BIO = 'Real quantum entropy for Web3. A public beacon every 10 seconds, an open entropy API and a Key Forge. Randomness, out of the void. $VOID';
-const DEX = 'VOID is a quantum entropy protocol. Its node pulls raw random bytes from a photonic quantum random number generator, mixes them with the NIST Randomness Beacon and drand, and publishes a signed, hash-chained beacon round every 10 seconds with every input printed, so anyone can recompute it. An open API serves private entropy with signed receipts, raw quantum bytes that are each delivered once, and provably fair draws and shuffles. The Key Forge builds a wallet in the browser from node entropy mixed with the device\'s own: a 24-word phrase, Ethereum and Solana addresses, and ML-DSA-65 and ML-KEM-768 post-quantum key pairs. The node never sees the keys.';
+const LINK = new Set(['Key art', 'QaaS', 'The round (video)', 'Fair draws', 'Key Forge (video)', 'Entropy API', 'Launch (fill CA)']);
+const BIO = 'Quantum-as-a-Service for Web3. Real quantum entropy over an open API: a public beacon, private bytes, fair draws and a Key Forge. QaaS. $VOID';
+const DEX = 'VOID is Quantum-as-a-Service (QaaS) for Web3: real quantum entropy over an open API. Its node pulls raw random bytes from a photonic quantum random number generator, mixes them with the NIST Randomness Beacon and drand, and publishes a signed, hash-chained beacon round every 10 seconds with every input printed, so anyone can recompute it. An open API serves private entropy with signed receipts, raw quantum bytes that are each delivered once, and provably fair draws and shuffles. The Key Forge builds a wallet in the browser from node entropy mixed with the device\'s own: a 24-word phrase, Ethereum and Solana addresses, and ML-DSA-65 and ML-KEM-768 post-quantum key pairs. The node never sees the keys.';
 const T = [
 ['Pinned · hype (video)', 'void-hype-14s.mp4', `Every wallet you own started as one random number.
 
-Most apps get it from a formula. VOID gets it from a photon, measured in a lab and served every 10 seconds.
+Most apps get it from a formula. VOID gets it from a photon and serves it over an API.
 
-Randomness networks are worth billions. This is the quantum one.
+That's Quantum-as-a-Service. Randomness networks are worth billions, and this is the quantum one.
 
 $VOID`],
 ['Key art', 'void-g01-keyart.png', `Chainlink is worth $6.98B. Pyth is worth $424M. Both sell randomness to Web3, and both make it with math.
 
-VOID makes it with physics: real quantum hardware, an open API and a public beacon anyone can check.
+VOID makes it with physics. Quantum-as-a-Service: real quantum hardware behind an open API, with a public beacon anyone can check.
+
+$VOID`],
+['QaaS', 'void-g13-qaas.png', `Quantum-as-a-Service, in one line: the quantum hardware is our problem and the result is your HTTP call.
+
+Five services behind one API: a beacon, private entropy, raw quantum bytes, fair draws and a Key Forge. No key. No account.
 
 $VOID`],
 ['The problem', 'void-g02-problem.png', `Weak randomness has already cost crypto real money.
@@ -93,9 +99,9 @@ QRL: $73.8M. Qubic: $49.0M. QANplatform: $13.5M.
 VOID isn't selling the word. It serves real quantum bytes over an open API today, at day-one size.
 
 $VOID`],
-['Entropy API', 'void-g10-api.png', `One call to VOID returns 32 bytes that nobody else will ever receive.
+['Entropy API', 'void-g10-api.png', `This is what QaaS looks like: one call to VOID returns 32 bytes that nobody else will ever receive.
 
-Fresh quantum bytes go into every response, the node signs a receipt, and you need no key to use it. A builder can plug it in this afternoon.
+Fresh quantum bytes go into every response, the node signs a receipt, and you need no key to use it.
 
 $VOID`],
 ['Roadmap', 'void-g11-roadmap.png', `Where VOID goes from here.
@@ -107,7 +113,7 @@ One node today. A network next.
 $VOID`],
 ['Launch (fill CA)', 'void-g12-live.png', `$VOID is live on Solana.
 
-A quantum beacon round every 10 seconds. An open entropy API. Wallets forged in your browser.
+Quantum-as-a-Service: a beacon round every 10 seconds, an open entropy API, wallets forged in your browser.
 
 Chainlink sells randomness at a $6.98B market cap. This is day one.
 
