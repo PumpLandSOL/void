@@ -21,7 +21,7 @@ try { for (const l of fs.readFileSync(path.join(ROOT, '.env'), 'utf8').split(/\r
 // ---------- PLACEHOLDERS: the only place the domain, the X handle and the repository are set (or use the env vars) ----------
 const SITE_URL = (process.env.SITE_URL || 'https://voidqaas.xyz').replace(/\/$/, '');
 const X_URL = process.env.X_URL || 'https://x.com/VoidQaas';
-const GH_URL = process.env.GH_URL || '';
+const GH_URL = process.env.GH_URL || 'https://github.com/VoidQaas/void';
 const TOKEN_CHAIN = process.env.TOKEN_CHAIN || 'Solana';
 const VOID_MINT = process.env.VOID_MINT || '';
 

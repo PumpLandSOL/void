@@ -4,8 +4,13 @@
   "description": "VOID ($VOID): Quantum-as-a-Service for Web3. Real quantum entropy over an open API: a public beacon, private bytes, fair draws and a key forge.",
   "type": "module",
   "main": "server/index.js",
-  "scripts": { "start": "node server/index.js", "test": "node test/run.js" },
-  "engines": { "node": ">=22" },
+  "scripts": {
+    "start": "node server/index.js",
+    "test": "node test/run.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
   "license": "MIT",
   "dependencies": {
     "@noble/curves": "^1.4.2",
@@ -14,5 +19,29 @@
     "@scure/base": "^1.1.7",
     "@scure/bip32": "^1.4.0",
     "@scure/bip39": "^1.3.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VoidQaas/void.git"
+  },
+  "homepage": "https://voidqaas.xyz",
+  "bugs": {
+    "url": "https://github.com/VoidQaas/void/issues"
+  },
+  "keywords": [
+    "quantum",
+    "qaas",
+    "quantum-as-a-service",
+    "qrng",
+    "randomness",
+    "randomness-beacon",
+    "entropy",
+    "verifiable-randomness",
+    "quantum-simulator",
+    "post-quantum",
+    "ml-dsa",
+    "ml-kem",
+    "solana",
+    "web3"
+  ]
 }

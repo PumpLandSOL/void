@@ -4,5 +4,6 @@ data.json.bak
 data.json.tmp
 .env
 *.log
-_studio/kit/
-_studio/frames-*/
+# brand assets and the tooling that renders them are kept outside the code repository
+brand/
+_studio/

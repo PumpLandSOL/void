@@ -1,5 +1,9 @@
 # VOID
 
+[![test](https://github.com/VoidQaas/void/actions/workflows/test.yml/badge.svg)](https://github.com/VoidQaas/void/actions/workflows/test.yml) [![license](https://img.shields.io/badge/license-MIT-a855f7)](LICENSE) [![node](https://img.shields.io/badge/node-%E2%89%A5%2022-a855f7)](.node-version)
+
+**[voidqaas.xyz](https://voidqaas.xyz)** · [Docs](https://voidqaas.xyz/docs) · [Console](https://voidqaas.xyz/console) · [Simulator](https://voidqaas.xyz/sim) · [X](https://x.com/VoidQaas)
+
 Quantum-as-a-Service (QaaS) for Web3: real quantum entropy over an open API. One Node.js process that pulls raw bytes from a photonic quantum random number generator and turns them into things you can use and check:
 
 - **Public beacon.** A signed, hash-chained round every 10 seconds. Each round prints its own inputs (32 quantum bytes, the node's committed value, the latest NIST Randomness Beacon pulse and drand round), so anyone can recompute the output.
@@ -12,9 +16,11 @@ Quantum-as-a-Service (QaaS) for Web3: real quantum entropy over an open API. One
 ## Run it
 
 ```bash
+git clone https://github.com/VoidQaas/void
+cd void
 npm install
 npm start          # http://localhost:8294
-npm test           # 51 checks, including live quantum bytes
+npm test           # 74 checks, including live quantum bytes
 ```
 
 Node 22 or newer. The server itself uses only Node's standard library; the dependencies are the audited `noble` and `scure` cryptography libraries, served to the browser from `/vendor`.
@@ -67,6 +73,10 @@ const prev = await (await fetch(base + '/api/beacon/11')).json();
 verifyRound(r, nodeKey, prev).ok;        // output, signature, chain link, commitment
 draw(r.output, 'my-raffle', 1, 500, 3);  // the same numbers the node returns
 ```
+
+## Contributing and security
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how the code is laid out and what a change needs. Report vulnerabilities privately as described in [SECURITY.md](SECURITY.md). Release notes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 
